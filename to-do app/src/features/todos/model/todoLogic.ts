@@ -33,7 +33,7 @@ export function getDefaultColor(): string {
   )
 }
 
-// ── Pure functions ─────────────────────────────────────────────────────────────
+// ── CRUD operations
 
 export function addTodo(todos: Todo[], title: string, color?: string): Todo[] {
   const trimmed = title.trim()
@@ -63,7 +63,7 @@ export function deleteTodo(todos: Todo[], id: string): Todo[] {
   return todos.filter(t => t.id !== id)
 }
 
-// ── Reducer ────────────────────────────────────────────────────────────────────
+// ── Reducer for state
 
 export function todosReducer(state: TodoState, action: TodoAction): TodoState {
   switch (action.type) {
@@ -84,7 +84,7 @@ export function todosReducer(state: TodoState, action: TodoAction): TodoState {
   }
 }
 
-// ── Selectors ──────────────────────────────────────────────────────────────────
+// ── Selectors
 
 export function selectFilteredTodos(todos: Todo[], filter: Filter, query: string): Todo[] {
   let result = filter === 'all' ? todos : todos.filter(t => t.status === filter)

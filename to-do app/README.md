@@ -1,16 +1,48 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Tech Stack
 
-Currently, two official plugins are available:
+- **React 19** + **Vite 8**
+- **TypeScript**
+- **React Router DOM v7**
+- Plain CSS with CSS variables
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Project Structure
 
-## React Compiler
+```
+src/
+  features/todos/
+    api/          # localStorage storage adapter
+    components/   # TodoForm, FilterBar, TodoList, TodoItem
+    hooks/        # useTodos — reducer + localStorage
+    model/        # Todo type + pure logic functions
+    utils/        # helper utilities
+  App.tsx
+  main.tsx
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Getting Started
 
-## Expanding the ESLint configuration
+```bash
+npm install
+npm run dev       # dev server at http://localhost:5173
+npm run build     # production build → dist/
+npm run preview   # preview production build
+npm run lint      # ESLint
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Features
+
+- Add, toggle, and delete todos
+- Filter by All / Active / Completed
+- Persisted to `localStorage` (key: `todos:v1`)
+- Keyboard accessible (Enter to submit, focus-visible styles)
+- XSS-safe — titles rendered as plain text
+
+## References
+
+-(FE at first) [django-react-todo-app](https://github.com/TuanTran0168/django-react-todo-app.git) by TuanTran0168
+- [TodoApp](https://github.com/maciekt07/TodoApp) by maciekt07
+
+## Design
+
+UI layout and assets inspired by the [Task Management Web App Design](https://www.figma.com/design/Oa55NERwMPgGQYJ9uhf3EU/Task--Management--Web-App-Design--Community-?node-id=2-384&t=1HVrXOKfyFEqZsYC-0) (Community) on Figma.
