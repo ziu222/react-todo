@@ -1,0 +1,29 @@
+import { Outlet } from 'react-router-dom'
+import { ThemeProvider } from './ThemeContext'
+import { TodosProvider } from './TodosContext'
+import { UserProvider } from './UserContext'
+import Sidebar   from '../components/layout/Sidebar'
+import TopBar    from '../components/layout/TopBar'
+import BottomNav from '../components/layout/BottomNav'
+import './Layout.css'
+
+export default function Layout() {
+  return (
+    <ThemeProvider>
+      <UserProvider>
+        <TodosProvider>
+          <div className="app-layout">
+            <Sidebar />
+            <div className="page-area">
+              <TopBar />
+              <main className="page-content">
+                <Outlet />
+              </main>
+            </div>
+            <BottomNav />
+          </div>
+        </TodosProvider>
+      </UserProvider>
+    </ThemeProvider>
+  )
+}
