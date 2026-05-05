@@ -1,8 +1,23 @@
-# Ignore all markdown files except README.md
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Local env files
+*.local
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Claude Code / agent tooling
+.claude/
+.agents/
+skills/
+
+# Markdown docs (planning, notes) — keep README
 *.md
 !README.md
-
-# Agent and Claude config folders
-.agents/
-.claude/
-skills/
