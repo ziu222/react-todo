@@ -1,0 +1,47 @@
+.task-chart {
+  background: var(--bg-card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  padding: 20px 20px 12px;
+  transition: background var(--transition-normal);
+}
+
+.task-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.task-chart-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.task-chart-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--accent-subtle);
+  border-radius: var(--radius-pill);
+  padding: 3px;
+}
+
+.task-chart-tab {
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.task-chart-tab.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.task-chart-tab:hover:not(.active) {
+  color: var(--accent);
+}
