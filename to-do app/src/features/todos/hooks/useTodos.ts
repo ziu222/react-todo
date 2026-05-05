@@ -1,7 +1,12 @@
 import { useReducer, useEffect, useRef } from 'react'
-import { todosReducer, INITIAL_STATE, selectFilteredTodos, selectCounts } from '../model/todoLogic'
+import {
+  todosReducer,
+  INITIAL_STATE,
+  selectFilteredTodos,
+  selectCounts,
+} from '../model/todoLogic'
 import { loadTodos, saveTodos } from '../api/storage'
-import type { Filter } from '../model/todoLogic'
+import type { Filter, TodoStatus } from '../model/todoLogic'
 
 export function useTodos() {
   const [state, dispatch] = useReducer(todosReducer, INITIAL_STATE)
@@ -27,11 +32,11 @@ export function useTodos() {
     counts:        selectCounts(state.todos),
     filter:        state.filter,
     query:         state.query,
-    addTodo:    (title: string)  => dispatch({ type: 'ADD',        payload: { title } }),
-    toggleTodo: (id: string)     => dispatch({ type: 'TOGGLE',     payload: { id } }),
-    pinTodo:    (id: string)     => dispatch({ type: 'PIN',        payload: { id } }),
-    deleteTodo: (id: string)     => dispatch({ type: 'DELETE',     payload: { id } }),
-    setFilter:  (filter: Filter) => dispatch({ type: 'SET_FILTER', payload: { filter } }),
-    setSearch:  (query: string)  => dispatch({ type: 'SET_SEARCH', payload: { query } }),
+    addTodo:      (title: string)              => dispatch({ type: 'ADD',           payload: { title } }),
+    updateStatus: (id: string, status: TodoStatus) => dispatch({ type: 'UPDATE_STATUS', payload: { id, status } }),
+    pinTodo:      (id: string)                 => dispatch({ type: 'PIN',           payload: { id } }),
+    deleteTodo:   (id: string)                 => dispatch({ type: 'DELETE',        payload: { id } }),
+    setFilter:    (filter: Filter)             => dispatch({ type: 'SET_FILTER',    payload: { filter } }),
+    setSearch:    (query: string)              => dispatch({ type: 'SET_SEARCH',    payload: { query } }),
   }
 }
