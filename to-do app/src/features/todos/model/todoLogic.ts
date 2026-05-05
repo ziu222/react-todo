@@ -1,5 +1,5 @@
-export type TodoStatus = 'todo' | 'in-progress' | 'done'
-export type Filter     = 'all'  | 'todo' | 'in-progress' | 'done'
+export type TodoStatus = 'backlog' | 'todo' | 'in-progress' | 'done'
+export type Filter     = 'all'   | 'backlog' | 'todo' | 'in-progress' | 'done'
 
 export interface Todo {
   id:        string
@@ -95,9 +95,10 @@ export function selectFilteredTodos(todos: Todo[], filter: Filter, query: string
 
 export function selectCounts(todos: Todo[]) {
   return {
-    all:          todos.length,
-    todo:         todos.filter(t => t.status === 'todo').length,
+    all:           todos.length,
+    backlog:       todos.filter(t => t.status === 'backlog').length,
+    todo:          todos.filter(t => t.status === 'todo').length,
     'in-progress': todos.filter(t => t.status === 'in-progress').length,
-    done:         todos.filter(t => t.status === 'done').length,
+    done:          todos.filter(t => t.status === 'done').length,
   }
 }
