@@ -2,7 +2,7 @@ import type { Todo, TodoStatus } from '../model/todoLogic'
 
 const STORAGE_KEY = 'todos:v1'
 
-const VALID_STATUSES: TodoStatus[] = ['todo', 'in-progress', 'done']
+const VALID_STATUSES: TodoStatus[] = ['backlog', 'todo', 'in-progress', 'done']
 
 function isValidTodo(item: unknown): item is Todo {
   if (typeof item !== 'object' || item === null) return false

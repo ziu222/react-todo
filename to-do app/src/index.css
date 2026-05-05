@@ -1,86 +1,94 @@
+/* ── Design tokens (defaults = lightPurple theme, overridden by themeFactory.apply()) ── */
 :root {
-  --bg-page:        #0f0f13;
-  --card-bg:        rgba(255, 255, 255, 0.04);
-  --card-border:    rgba(255, 255, 255, 0.09);
-  --card-shadow:    0 24px 64px rgba(0, 0, 0, 0.6),
-                    0 0 0 1px rgba(255, 255, 255, 0.04);
-  --text-primary:   #f0f0f5;
-  --text-secondary: #9090a0;
-  --text-muted:     #5a5a6e;
-  --accent:         #7c3aed;
-  --accent-light:   #9d5cf2;
-  --accent-glow:    rgba(124, 58, 237, 0.35);
-  --accent-subtle:  rgba(124, 58, 237, 0.25);
-  --border-color:   rgba(255, 255, 255, 0.10);
-  --surface-hover:  rgba(255, 255, 255, 0.05);
-  --radius-md:      10px;
-  --radius-pill:    999px;
+  --bg-page:        #F5F3FF;
+  --bg-card:        #FFFFFF;
+  --bg-card-hover:  #F9F7FF;
+  --bg-sidebar:     #FFFFFF;
+  --card-border:    rgba(139, 92, 246, 0.12);
+  --card-shadow:    0 2px 12px rgba(139, 92, 246, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --text-primary:   #1F1235;
+  --text-secondary: #6B7280;
+  --text-muted:     #9CA3AF;
+  --text-on-accent: #FFFFFF;
+  --accent:         #8B5CF6;
+  --accent-light:   #A78BFA;
+  --accent-glow:    rgba(139, 92, 246, 0.30);
+  --accent-subtle:  rgba(139, 92, 246, 0.10);
+  --border-color:   rgba(139, 92, 246, 0.15);
+  --input-bg:       #F5F3FF;
+
+  /* Static tokens — not overridden by themes */
+  --radius-sm:   6px;
+  --radius-md:   12px;
+  --radius-lg:   18px;
+  --radius-pill: 999px;
   --transition-fast:   120ms ease;
   --transition-normal: 200ms ease;
-  --font-sans: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --sidebar-width: 88px;
+  --font-sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  /* Task status colors */
+  --status-todo:        #8B5CF6;
+  --status-in-progress: #F59E0B;
+  --status-done:        #10B981;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-}
+/* ── Base resets ── */
+*, *::before, *::after { box-sizing: border-box; }
 
 html {
   font-family: var(--font-sans);
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
 }
 
 body {
   margin: 0;
   background-color: var(--bg-page);
+  color: var(--text-primary);
+  min-height: 100svh;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* Dark mode radial glow on body */
+[data-theme-mode='dark'] body {
   background-image: radial-gradient(
     ellipse 80% 60% at 50% 0%,
-    rgba(124, 58, 237, 0.12),
+    var(--accent-glow),
     transparent 70%
   );
   background-attachment: fixed;
-  color: var(--text-primary);
-  min-height: 100svh;
 }
 
-*:focus {
-  outline: none;
-}
-
-*:focus-visible {
+/* ── Focus ── */
+*:focus          { outline: none; }
+*:focus-visible  {
   outline: 2px solid var(--accent-light);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
-button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  background: none;
-  padding: 0;
-}
+/* ── Element resets ── */
+button { font-family: inherit; cursor: pointer; border: none; background: none; padding: 0; }
+input, textarea { font-family: inherit; }
+p, h1, h2, h3, h4 { margin: 0; }
+ul, ol { margin: 0; padding: 0; list-style: none; }
 
-input {
-  font-family: inherit;
-}
-
+/* ── Search highlight ── */
 mark.highlight {
   background: var(--accent-subtle);
-  color: var(--accent-light);
+  color: var(--accent);
   border-radius: 3px;
   padding: 0 2px;
   font-style: normal;
 }
 
+/* ── Utility ── */
 .sr-only {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;

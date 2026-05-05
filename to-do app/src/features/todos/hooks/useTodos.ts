@@ -11,9 +11,7 @@ import type { Filter, TodoStatus } from '../model/todoLogic'
 export function useTodos() {
   const [state, dispatch] = useReducer(todosReducer, INITIAL_STATE)
 
-  // Prevents saving an empty array before localStorage data is loaded.
-  // Without this, React 19 StrictMode's double-mount fires the persistence
-  // effect before HYDRATE, wiping real saved data.
+
   const hydratedRef = useRef(false)
 
   useEffect(() => {
