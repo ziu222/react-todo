@@ -21,3 +21,4 @@ skills/
 # Markdown docs (planning, notes) — keep README
 *.md
 !README.md
+!docs/project-milestone.md

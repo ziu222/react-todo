@@ -6,7 +6,7 @@ import Sidebar   from '../components/layout/Sidebar'
 import TopBar    from '../components/layout/TopBar'
 import BottomNav from '../components/layout/BottomNav'
 import './Layout.css'
-
+// ── Main layout component wrapping pages
 export default function Layout() {
   return (
     <ThemeProvider>
