@@ -1,18 +1,23 @@
 import type { TLViewMode } from '../../pages/TimelinePage'
+import { toMidnight } from '../../features/todos/model/todoLogic'
 import './TimelineHeader.css'
 
 interface TimelineHeaderProps {
-  visibleDays:  Date[]
-  viewMode:     TLViewMode
-  onViewChange: (mode: TLViewMode) => void
-  onPrev:       () => void
-  onNext:       () => void
-  onToday:      () => void
+  visibleDays:   Date[]
+  viewMode:      TLViewMode
+  onViewChange:  (mode: TLViewMode) => void
+  onPrev:        () => void
+  onNext:        () => void
+  onToday:       () => void
+  onDayClick?:   (dayMs: number) => void
+  selectedDayMs?: number
 }
 
 const DOW = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
 
-export default function TimelineHeader({ visibleDays, viewMode, onViewChange, onPrev, onNext, onToday }: TimelineHeaderProps) {
+export default function TimelineHeader({
+  visibleDays, viewMode, onViewChange, onPrev, onNext, onToday, onDayClick, selectedDayMs
+}: TimelineHeaderProps) {
   const today = new Date()
 
   const rangeLabel = viewMode === 'month'
@@ -62,13 +67,20 @@ export default function TimelineHeader({ visibleDays, viewMode, onViewChange, on
         <div className="tl-label-spacer" />
         <div className="tl-date-strip" role="row" aria-label="Days">
           {visibleDays.map(d => {
-            const isToday   = d.toDateString() === today.toDateString()
-            const isWeekend = d.getDay() === 0 || d.getDay() === 6
+            const isToday    = d.toDateString() === today.toDateString()
+            const isWeekend  = d.getDay() === 0 || d.getDay() === 6
+            const dayMs      = toMidnight(d)
+            const isSelected = dayMs === selectedDayMs
             return (
               <div
                 key={d.toISOString()}
-                className={`tl-date-cell${isToday ? ' today' : ''}${isWeekend ? ' weekend' : ''}`}
+                className={`tl-date-cell${isToday ? ' today' : ''}${isWeekend ? ' weekend' : ''}${isSelected ? ' selected' : ''}`}
+                role="button"
+                tabIndex={0}
+                onClick={() => onDayClick?.(dayMs)}
+                onKeyDown={e => e.key === 'Enter' && onDayClick?.(dayMs)}
                 aria-current={isToday ? 'date' : undefined}
+                aria-pressed={isSelected}
               >
                 <span className="tl-date-dow">{DOW[d.getDay()]}</span>
                 <span className="tl-date-num">{d.getDate()}</span>
