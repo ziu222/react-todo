@@ -1,0 +1,96 @@
+.tl-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  transition: background var(--transition-normal);
+}
+
+.tl-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tl-month-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 140px;
+  text-align: center;
+}
+
+.tl-nav-btn {
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.tl-nav-btn:hover {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border-color: var(--accent-light);
+}
+
+.tl-nav-btn.icon {
+  padding: 5px 8px;
+  display: flex;
+  align-items: center;
+}
+
+.tl-nav-btn.icon svg { width: 16px; height: 16px; }
+
+.tl-date-strip {
+  display: grid;
+  grid-template-columns: repeat(var(--day-count, 30), 1fr);
+  gap: 2px;
+  overflow-x: auto;
+}
+
+.tl-date-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 2px;
+  border-radius: var(--radius-sm);
+  min-width: 28px;
+}
+
+.tl-date-cell.today {
+  background: var(--accent-subtle);
+}
+
+.tl-date-cell.today .tl-date-num {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tl-date-dow {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.tl-date-num {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
