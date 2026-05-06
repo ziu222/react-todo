@@ -1,3 +1,4 @@
+import React from 'react'
 import type { Todo, TodoStatus, Priority } from '../../features/todos/model/todoLogic'
 import { calcProgress } from '../../features/todos/model/todoLogic'
 import { highlightMatchingText } from '../../features/todos/utils/highlightMatchingText'
@@ -21,6 +22,52 @@ const PRIORITY_COLOR: Record<Priority, string> = {
   low:    '#10B981',
   medium: '#F59E0B',
   high:   '#EF4444',
+}
+
+function IconPlay() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+      <path d="M8 5v14l11-7z" />
+    </svg>
+  )
+}
+
+function IconClock() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 6v6l4 2" />
+    </svg>
+  )
+}
+
+function IconCheck() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 6L9 17l-5-5" />
+    </svg>
+  )
+}
+
+function IconList() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="8" y1="6" x2="21" y2="6" />
+      <line x1="8" y1="12" x2="21" y2="12" />
+      <line x1="8" y1="18" x2="21" y2="18" />
+      <line x1="3" y1="6" x2="3.01" y2="6" />
+      <line x1="3" y1="12" x2="3.01" y2="12" />
+      <line x1="3" y1="18" x2="3.01" y2="18" />
+    </svg>
+  )
+}
+
+function IconBell() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
+    </svg>
+  )
 }
 
 function IconPin({ filled }: { filled: boolean }) {
@@ -48,106 +95,119 @@ function IconArrow() {
   )
 }
 
-function IconCalendar() {
+function IconPaperclip() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="4" width="18" height="18" rx="2" />
-      <line x1="16" y1="2" x2="16" y2="6" />
-      <line x1="8" y1="2" x2="8" y2="6" />
-      <line x1="3" y1="10" x2="21" y2="10" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66L9.41 17.41a2 2 0 01-2.83-2.83l8.49-8.48" />
     </svg>
   )
 }
 
-export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onPin }: KanbanCardProps) {
-  const nextStatus  = STATUS_NEXT[todo.status]
-  const chipLabel   = todo.tags?.[0] ?? todo.status
-  const extraTags   = todo.tags && todo.tags.length > 1 ? todo.tags.slice(1) : []
+const STATUS_ICON: Record<TodoStatus, React.ReactElement> = {
+  backlog:      <IconList />,
+  todo:         <IconClock />,
+  'in-progress': <IconPlay />,
+  done:         <IconCheck />,
+}
 
-  const todayMs     = new Date().setHours(0, 0, 0, 0)
-  const progress    = todo.startDay != null && todo.endDay != null
+const fmt = (ms: number) =>
+  new Date(ms).toLocaleDateString('en', { month: 'short', day: 'numeric' })
+
+export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onPin }: KanbanCardProps) {
+  const nextStatus = STATUS_NEXT[todo.status]
+  const todayMs    = new Date().setHours(0, 0, 0, 0)
+  const progress   = todo.startDay != null && todo.endDay != null
     ? calcProgress(todo.startDay, todo.endDay)
     : null
-  const isOverdue   = todo.endDay != null && todo.endDay < todayMs && todo.status !== 'done'
-
-  const fmt = (ms: number) => new Date(ms).toLocaleDateString('en', { month: 'short', day: 'numeric' })
-  const dateLabel = todo.startDay && todo.endDay
-    ? (todo.startDay === todo.endDay ? fmt(todo.startDay) : `${fmt(todo.startDay)} – ${fmt(todo.endDay)}`)
-    : todo.startDay
-      ? fmt(todo.startDay)
-      : fmt(todo.createdAt)
+  const isOverdue  = todo.endDay != null && todo.endDay < todayMs && todo.status !== 'done'
 
   return (
-    <article className={`kanban-card${todo.pinned ? ' pinned' : ''}`} data-status={todo.status}>
+    <article className={`kc-card${todo.pinned ? ' pinned' : ''}`} data-status={todo.status}>
 
-      {/* Category chip + priority */}
-      <div className="kanban-card-chips">
-        <span className="kanban-card-chip" style={{ background: `${todo.color}22`, color: todo.color }}>
-          <span className="kanban-card-dot" style={{ background: todo.color }} />
-          {chipLabel}
-        </span>
+      {/* ── Left: status orb + dates ── */}
+      <div className="kc-left">
+        <div className="kc-orb" style={{ background: `${todo.color}1a`, color: todo.color }}>
+          {STATUS_ICON[todo.status]}
+        </div>
+        <div className="kc-dates">
+          {todo.startDay ? (
+            <>
+              <span className="kc-date-item">
+                <span className="kc-date-lbl">Start</span>
+                <span className="kc-date-val">{fmt(todo.startDay)}</span>
+              </span>
+              {todo.endDay && (
+                <span className="kc-date-item">
+                  <span className="kc-date-lbl">End</span>
+                  <span className={`kc-date-val${isOverdue ? ' overdue' : ''}`}>{fmt(todo.endDay)}</span>
+                </span>
+              )}
+            </>
+          ) : (
+            <span className="kc-date-item">
+              <span className="kc-date-lbl">Created</span>
+              <span className="kc-date-val">{fmt(todo.createdAt)}</span>
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* ── Center: title + tags ── */}
+      <div className="kc-body">
+        <p className="kc-title">{highlightMatchingText(todo.title, query)}</p>
+        <div className="kc-meta-row">
+          {todo.tags?.slice(0, 2).map(t => (
+            <span key={t} className="kc-tag">{t}</span>
+          ))}
+          {todo.attachments && todo.attachments.length > 0 && (
+            <span className="kc-meta-item">
+              <IconPaperclip />
+              {todo.attachments.length}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* ── Progress ── */}
+      {progress !== null && (
+        <div className="kc-progress">
+          <span className="kc-progress-pct">{progress}% complete</span>
+          <div className="kc-progress-track">
+            <div className="kc-progress-fill" style={{ width: `${progress}%` }} />
+          </div>
+        </div>
+      )}
+
+      {/* ── Right: priority badge + actions ── */}
+      <div className="kc-right">
         {todo.priority && (
           <span
-            className="kanban-card-priority"
-            style={{ color: PRIORITY_COLOR[todo.priority], background: `${PRIORITY_COLOR[todo.priority]}18` }}
+            className="kc-priority-badge"
+            style={{ color: PRIORITY_COLOR[todo.priority], background: `${PRIORITY_COLOR[todo.priority]}15` }}
           >
+            <IconBell />
             {todo.priority}
           </span>
         )}
-      </div>
-
-      {/* Title */}
-      <p className="kanban-card-title">
-        {highlightMatchingText(todo.title, query)}
-      </p>
-
-      {/* Additional tags */}
-      {extraTags.length > 0 && (
-        <div className="kanban-card-tags">
-          {extraTags.map(t => (
-            <span key={t} className="kanban-card-tag">{t}</span>
-          ))}
-        </div>
-      )}
-
-      {/* Progress bar — derived from startDay/endDay */}
-      {progress !== null && progress > 0 && (
-        <div className="kanban-card-progress">
-          <div className="kanban-card-progress-track">
-            <div className="kanban-card-progress-bar" style={{ width: `${progress}%` }} />
-          </div>
-          <span className="kanban-card-progress-label">{progress}%</span>
-        </div>
-      )}
-
-      {/* Footer */}
-      <div className="kanban-card-footer">
-        <span className={`kanban-card-date${isOverdue ? ' overdue' : ''}`}>
-          <IconCalendar />
-          {dateLabel}
-        </span>
-
-        <div className="kanban-card-actions">
+        <div className="kc-actions">
           <button
-            className={`kanban-card-btn pin${todo.pinned ? ' active' : ''}`}
+            className={`kc-btn${todo.pinned ? ' active' : ''}`}
             onClick={() => onPin(todo.id)}
             aria-label={todo.pinned ? 'Unpin' : 'Pin'}
           >
             <IconPin filled={todo.pinned} />
           </button>
-
           {nextStatus && (
             <button
-              className="kanban-card-btn advance"
+              className="kc-btn"
               onClick={() => onUpdateStatus(todo.id, nextStatus)}
               aria-label={`Move to ${nextStatus}`}
             >
               <IconArrow />
             </button>
           )}
-
           <button
-            className="kanban-card-btn delete"
+            className="kc-btn delete"
             onClick={() => onDelete(todo.id)}
             aria-label="Delete task"
           >
@@ -155,6 +215,7 @@ export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onPi
           </button>
         </div>
       </div>
+
     </article>
   )
 }
