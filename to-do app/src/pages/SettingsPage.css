@@ -79,13 +79,18 @@
   transition: border-color var(--transition-fast);
 }
 
-.settings-input[type='file'] {
-  height: auto;
-  padding: 6px 12px;
-  cursor: pointer;
-}
 
 .settings-input:focus { border-color: var(--accent-light); outline: none; }
+
+/* Override browser autofill blue/yellow tint */
+.settings-input:-webkit-autofill,
+.settings-input:-webkit-autofill:hover,
+.settings-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--input-bg) inset !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 
 .settings-hint {
   font-size: 0.72rem;

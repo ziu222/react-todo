@@ -8,15 +8,7 @@ type Tab = 'details' | 'theme'
 
 export default function SettingsPage() {
   const [tab, setTab] = useState<Tab>('details')
-  const { user, setFirstName, setLastName, setEmail, setCoverColor, setAvatar } = useUserContext()
-
-  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = ev => setAvatar(ev.target?.result as string)
-    reader.readAsDataURL(file)
-  }
+  const { user, setFirstName, setLastName, setEmail, setCoverColor } = useUserContext()
 
   return (
     <div className="settings-page">
@@ -91,15 +83,6 @@ export default function SettingsPage() {
                 />
                 <span className="settings-hint">Pick the start colour for your profile cover.</span>
               </div>
-            </label>
-            <label className="settings-label">
-              Avatar image
-              <input
-                type="file"
-                accept="image/*"
-                className="settings-input"
-                onChange={handleAvatarChange}
-              />
             </label>
           </div>
         )}
