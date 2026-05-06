@@ -17,11 +17,11 @@ function isValidTodo(item: unknown): item is Todo {
     !VALID_STATUSES.includes(t.status as TodoStatus)
   ) return false
   // optional fields — accept if present and correct type, or absent
-  if (t.dueDate     !== undefined && typeof t.dueDate     !== 'number')  return false
+  if (t.startDay    !== undefined && typeof t.startDay    !== 'number')  return false
+  if (t.endDay      !== undefined && typeof t.endDay      !== 'number')  return false
   if (t.priority    !== undefined && !['low','medium','high'].includes(t.priority as string)) return false
   if (t.tags        !== undefined && !Array.isArray(t.tags))             return false
   if (t.description !== undefined && typeof t.description !== 'string')  return false
-  if (t.progress    !== undefined && typeof t.progress    !== 'number')  return false
   if (t.attachments !== undefined && !Array.isArray(t.attachments))      return false
   return true
 }

@@ -23,7 +23,7 @@ export default function KanbanBoard() {
           accentColor={col.color}
           todos={filteredTodos.filter(t => t.status === col.status)}
           query={query}
-          onAdd={title => addTodo(title)}
+          onAdd={({ title, ...extras }) => addTodo(title, extras)}
           onUpdateStatus={updateStatus}
           onDelete={deleteTodo}
           onPin={pinTodo}

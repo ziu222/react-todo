@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 import type { TodoStatus, Priority, Attachment } from '../../features/todos/model/todoLogic'
+import { calcProgress } from '../../features/todos/model/todoLogic'
 import './AddTaskModal.css'
 
 const PRESET_TAGS = ['Planning', 'Research', 'Content', 'Development', 'Design', 'Marketing']
@@ -10,17 +11,23 @@ const PRIORITY_OPTIONS: { value: Priority; label: string }[] = [
   { value: 'high',   label: 'High Priority'   },
 ]
 
+// Parse a YYYY-MM-DD string as local midnight timestamp
+function dateStrToMs(s: string): number {
+  const [y, m, d] = s.split('-').map(Number)
+  return new Date(y, m - 1, d).getTime()
+}
+
 interface AddTaskModalProps {
   initialStatus: TodoStatus
   onClose:  () => void
   onSubmit: (data: {
     title:        string
     status:       TodoStatus
-    dueDate?:     number
+    startDay?:    number
+    endDay?:      number
     priority?:    Priority
     tags?:        string[]
     description?: string
-    progress?:    number
     attachments?: Attachment[]
   }) => void
 }
@@ -64,17 +71,28 @@ function IconInfo() {
 }
 
 export default function AddTaskModal({ initialStatus, onClose, onSubmit }: AddTaskModalProps) {
+  const todayStr = new Date().toISOString().split('T')[0]
+
   const [title,       setTitle]       = useState('')
-  const [dueDate,     setDueDate]     = useState('')
+  const [startDay,    setStartDay]    = useState('')
+  const [endDay,      setEndDay]      = useState('')
   const [priority,    setPriority]    = useState<Priority>('medium')
   const [tags,        setTags]        = useState<string[]>([])
   const [customTag,   setCustomTag]   = useState('')
   const [description, setDescription] = useState('')
-  const [progress,    setProgress]    = useState(0)
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [dragging,    setDragging]    = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Derive progress from selected dates
+  const startMs      = startDay ? dateStrToMs(startDay) : null
+  const endMs        = endDay   ? dateStrToMs(endDay)   : null
+  const todayMs      = new Date().setHours(0, 0, 0, 0)
+  const autoProgress = startMs !== null && endMs !== null && endMs >= startMs
+    ? calcProgress(startMs, endMs)
+    : null
+  const willBeDone   = endMs !== null && endMs < todayMs
 
   function toggleTag(tag: string) {
     setTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag])
@@ -105,11 +123,11 @@ export default function AddTaskModal({ initialStatus, onClose, onSubmit }: AddTa
     onSubmit({
       title:       title.trim(),
       status:      initialStatus,
-      dueDate:     dueDate  ? new Date(dueDate).getTime() : undefined,
+      startDay:    startMs ?? undefined,
+      endDay:      endMs   ?? undefined,
       priority,
       tags:        tags.length        ? tags        : undefined,
       description: description.trim() || undefined,
-      progress:    progress > 0       ? progress    : undefined,
       attachments: attachments.length ? attachments : undefined,
     })
     onClose()
@@ -147,27 +165,49 @@ export default function AddTaskModal({ initialStatus, onClose, onSubmit }: AddTa
 
                 <div className="modal-row">
                   <label className="modal-field-label">
-                    DUE DATE
+                    START DAY
                     <input
                       className="modal-input"
                       type="date"
-                      value={dueDate}
-                      onChange={e => setDueDate(e.target.value)}
+                      value={startDay}
+                      min={todayStr}
+                      onChange={e => {
+                        setStartDay(e.target.value)
+                        if (endDay && e.target.value > endDay) setEndDay(e.target.value)
+                      }}
                     />
                   </label>
                   <label className="modal-field-label">
-                    PRIORITY
-                    <select
-                      className="modal-input modal-select"
-                      value={priority}
-                      onChange={e => setPriority(e.target.value as Priority)}
-                    >
-                      {PRIORITY_OPTIONS.map(o => (
-                        <option key={o.value} value={o.value}>{o.label}</option>
-                      ))}
-                    </select>
+                    END DAY
+                    <input
+                      className="modal-input"
+                      type="date"
+                      value={endDay}
+                      min={startDay || todayStr}
+                      onChange={e => setEndDay(e.target.value)}
+                    />
                   </label>
                 </div>
+
+                <label className="modal-field-label">
+                  PRIORITY
+                  <select
+                    className="modal-input modal-select"
+                    value={priority}
+                    onChange={e => setPriority(e.target.value as Priority)}
+                  >
+                    {PRIORITY_OPTIONS.map(o => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                </label>
+
+                {willBeDone && (
+                  <div className="modal-info-banner modal-warn-banner">
+                    <IconInfo />
+                    <p>End date is in the past — this task will be marked as <strong>Done</strong> automatically.</p>
+                  </div>
+                )}
               </div>
 
               {/* Card 2: Categorization */}
@@ -197,7 +237,6 @@ export default function AddTaskModal({ initialStatus, onClose, onSubmit }: AddTa
                       maxLength={40}
                     />
                   </div>
-                  {/* Selected custom tags */}
                   {tags.filter(t => !PRESET_TAGS.includes(t)).map(t => (
                     <span key={t} className="tag-chip active custom">
                       {t}
@@ -208,20 +247,29 @@ export default function AddTaskModal({ initialStatus, onClose, onSubmit }: AddTa
 
                 <div className="modal-field-label">
                   <div className="progress-header">
-                    <span>INITIAL PROGRESS</span>
-                    <span className="progress-value">{progress}%</span>
+                    <span>AUTO PROGRESS</span>
+                    <span className="progress-value">
+                      {autoProgress !== null ? `${autoProgress}%` : '—'}
+                    </span>
                   </div>
-                  <input
-                    className="progress-slider"
-                    type="range"
-                    min={0}
-                    max={100}
-                    value={progress}
-                    onChange={e => setProgress(Number(e.target.value))}
-                  />
+                  {autoProgress !== null ? (
+                    <div className="progress-track">
+                      <div className="progress-fill" style={{ width: `${autoProgress}%` }} />
+                    </div>
+                  ) : (
+                    <p className="progress-empty-hint">Set start &amp; end dates to auto-track progress</p>
+                  )}
                   <div className="progress-labels">
-                    <span>START</span>
-                    <span>COMPLETE</span>
+                    <span>
+                      {startDay
+                        ? new Date(dateStrToMs(startDay)).toLocaleDateString('en', { month: 'short', day: 'numeric' })
+                        : 'START'}
+                    </span>
+                    <span>
+                      {endDay
+                        ? new Date(dateStrToMs(endDay)).toLocaleDateString('en', { month: 'short', day: 'numeric' })
+                        : 'END'}
+                    </span>
                   </div>
                 </div>
               </div>
