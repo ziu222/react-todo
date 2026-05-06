@@ -15,12 +15,20 @@ export interface Todo {
   createdAt:    number
   pinned:       boolean
   color:        string
-  dueDate?:     number        // Unix ms
+  startDay?:    number        // Unix ms, local midnight of start date
+  endDay?:      number        // Unix ms, local midnight of end date
   priority?:    Priority
   tags?:        string[]
   description?: string
-  progress?:    number        // 0–100
   attachments?: Attachment[]
+}
+
+// Returns 0–100. Progress is derived from dates, never stored manually.
+export function calcProgress(startDay: number, endDay: number): number {
+  const todayMs = new Date().setHours(0, 0, 0, 0)
+  if (todayMs < startDay) return 0
+  if (startDay === endDay || todayMs >= endDay) return 100
+  return Math.round(((todayMs - startDay) / (endDay - startDay)) * 100)
 }
 
 export interface TodoState {
@@ -33,11 +41,11 @@ export type TodoAction =
   | { type: 'ADD'; payload: {
       title:        string
       color?:       string
-      dueDate?:     number
+      startDay?:    number
+      endDay?:      number
       priority?:    Priority
       tags?:        string[]
       description?: string
-      progress?:    number
       attachments?: Attachment[]
     }}
   | { type: 'UPDATE_STATUS'; payload: { id: string; status: TodoStatus } }
@@ -64,20 +72,27 @@ export function addTodo(
 ): Todo[] {
   const trimmed = title.trim()
   if (!trimmed || trimmed.length > 500) return todos
+
+  // If endDay is already in the past, auto-mark as done
+  const todayMs = new Date().setHours(0, 0, 0, 0)
+  const autoStatus = extras?.endDay !== undefined && extras.endDay < todayMs
+    ? 'done'
+    : (extras?.status ?? 'todo')
+
   return [
     ...todos,
     {
-      id:        crypto.randomUUID(),
-      title:     trimmed,
-      status:    extras?.status    ?? 'todo',
-      createdAt: Date.now(),
-      pinned:    false,
-      color:     extras?.color     ?? getDefaultColor(),
-      dueDate:   extras?.dueDate,
-      priority:  extras?.priority,
-      tags:      extras?.tags,
+      id:          crypto.randomUUID(),
+      title:       trimmed,
+      status:      autoStatus,
+      createdAt:   Date.now(),
+      pinned:      false,
+      color:       extras?.color     ?? getDefaultColor(),
+      startDay:    extras?.startDay,
+      endDay:      extras?.endDay,
+      priority:    extras?.priority,
+      tags:        extras?.tags,
       description: extras?.description,
-      progress:  extras?.progress,
       attachments: extras?.attachments,
     },
   ]

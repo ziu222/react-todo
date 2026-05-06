@@ -1,4 +1,5 @@
 import type { Todo, TodoStatus, Priority } from '../../features/todos/model/todoLogic'
+import { calcProgress } from '../../features/todos/model/todoLogic'
 import { highlightMatchingText } from '../../features/todos/utils/highlightMatchingText'
 import './KanbanCard.css'
 
@@ -62,11 +63,19 @@ export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onPi
   const nextStatus  = STATUS_NEXT[todo.status]
   const chipLabel   = todo.tags?.[0] ?? todo.status
   const extraTags   = todo.tags && todo.tags.length > 1 ? todo.tags.slice(1) : []
-  const isOverdue   = todo.dueDate && todo.dueDate < Date.now() && todo.status !== 'done'
-  const dueDateStr  = todo.dueDate
-    ? new Date(todo.dueDate).toLocaleDateString('en', { month: 'short', day: 'numeric' })
+
+  const todayMs     = new Date().setHours(0, 0, 0, 0)
+  const progress    = todo.startDay != null && todo.endDay != null
+    ? calcProgress(todo.startDay, todo.endDay)
     : null
-  const createdStr  = new Date(todo.createdAt).toLocaleDateString('en', { month: 'short', day: 'numeric' })
+  const isOverdue   = todo.endDay != null && todo.endDay < todayMs && todo.status !== 'done'
+
+  const fmt = (ms: number) => new Date(ms).toLocaleDateString('en', { month: 'short', day: 'numeric' })
+  const dateLabel = todo.startDay && todo.endDay
+    ? (todo.startDay === todo.endDay ? fmt(todo.startDay) : `${fmt(todo.startDay)} – ${fmt(todo.endDay)}`)
+    : todo.startDay
+      ? fmt(todo.startDay)
+      : fmt(todo.createdAt)
 
   return (
     <article className={`kanban-card${todo.pinned ? ' pinned' : ''}`} data-status={todo.status}>
@@ -101,13 +110,13 @@ export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onPi
         </div>
       )}
 
-      {/* Progress bar */}
-      {todo.progress != null && todo.progress > 0 && (
+      {/* Progress bar — derived from startDay/endDay */}
+      {progress !== null && progress > 0 && (
         <div className="kanban-card-progress">
           <div className="kanban-card-progress-track">
-            <div className="kanban-card-progress-bar" style={{ width: `${todo.progress}%` }} />
+            <div className="kanban-card-progress-bar" style={{ width: `${progress}%` }} />
           </div>
-          <span className="kanban-card-progress-label">{todo.progress}%</span>
+          <span className="kanban-card-progress-label">{progress}%</span>
         </div>
       )}
 
@@ -115,7 +124,7 @@ export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onPi
       <div className="kanban-card-footer">
         <span className={`kanban-card-date${isOverdue ? ' overdue' : ''}`}>
           <IconCalendar />
-          {dueDateStr ?? createdStr}
+          {dateLabel}
         </span>
 
         <div className="kanban-card-actions">

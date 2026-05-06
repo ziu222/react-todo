@@ -11,11 +11,11 @@ import type { Filter, TodoStatus, Priority, Attachment } from '../model/todoLogi
 interface AddTodoExtras {
   status?:      TodoStatus
   color?:       string
-  dueDate?:     number
+  startDay?:    number
+  endDay?:      number
   priority?:    Priority
   tags?:        string[]
   description?: string
-  progress?:    number
   attachments?: Attachment[]
 }
 

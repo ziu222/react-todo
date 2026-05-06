@@ -7,11 +7,11 @@ import './KanbanColumn.css'
 export interface AddTaskData {
   title:        string
   status:       TodoStatus
-  dueDate?:     number
+  startDay?:    number
+  endDay?:      number
   priority?:    Priority
   tags?:        string[]
   description?: string
-  progress?:    number
   attachments?: Attachment[]
 }
 
