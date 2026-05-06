@@ -1,13 +1,26 @@
 export type TodoStatus = 'backlog' | 'todo' | 'in-progress' | 'done'
 export type Filter     = 'all'   | 'backlog' | 'todo' | 'in-progress' | 'done'
+export type Priority   = 'low' | 'medium' | 'high'
+
+export interface Attachment {
+  name: string
+  type: string
+  data: string   // base64 data URL
+}
 
 export interface Todo {
-  id:        string
-  title:     string
-  status:    TodoStatus
-  createdAt: number
-  pinned:    boolean
-  color:     string
+  id:           string
+  title:        string
+  status:       TodoStatus
+  createdAt:    number
+  pinned:       boolean
+  color:        string
+  dueDate?:     number        // Unix ms
+  priority?:    Priority
+  tags?:        string[]
+  description?: string
+  progress?:    number        // 0–100
+  attachments?: Attachment[]
 }
 
 export interface TodoState {
@@ -17,7 +30,16 @@ export interface TodoState {
 }
 
 export type TodoAction =
-  | { type: 'ADD';           payload: { title: string; color?: string } }
+  | { type: 'ADD'; payload: {
+      title:        string
+      color?:       string
+      dueDate?:     number
+      priority?:    Priority
+      tags?:        string[]
+      description?: string
+      progress?:    number
+      attachments?: Attachment[]
+    }}
   | { type: 'UPDATE_STATUS'; payload: { id: string; status: TodoStatus } }
   | { type: 'PIN';           payload: { id: string } }
   | { type: 'DELETE';        payload: { id: string } }
@@ -35,7 +57,11 @@ export function getDefaultColor(): string {
 
 // ── CRUD operations
 
-export function addTodo(todos: Todo[], title: string, color?: string): Todo[] {
+export function addTodo(
+  todos: Todo[],
+  title: string,
+  extras?: Omit<Partial<Todo>, 'id' | 'title' | 'createdAt' | 'pinned'>,
+): Todo[] {
   const trimmed = title.trim()
   if (!trimmed || trimmed.length > 500) return todos
   return [
@@ -43,10 +69,16 @@ export function addTodo(todos: Todo[], title: string, color?: string): Todo[] {
     {
       id:        crypto.randomUUID(),
       title:     trimmed,
-      status:    'todo',
+      status:    extras?.status    ?? 'todo',
       createdAt: Date.now(),
       pinned:    false,
-      color:     color ?? getDefaultColor(),
+      color:     extras?.color     ?? getDefaultColor(),
+      dueDate:   extras?.dueDate,
+      priority:  extras?.priority,
+      tags:      extras?.tags,
+      description: extras?.description,
+      progress:  extras?.progress,
+      attachments: extras?.attachments,
     },
   ]
 }
@@ -67,8 +99,10 @@ export function deleteTodo(todos: Todo[], id: string): Todo[] {
 
 export function todosReducer(state: TodoState, action: TodoAction): TodoState {
   switch (action.type) {
-    case 'ADD':
-      return { ...state, todos: addTodo(state.todos, action.payload.title, action.payload.color) }
+    case 'ADD': {
+      const { title, ...extras } = action.payload
+      return { ...state, todos: addTodo(state.todos, title, extras) }
+    }
     case 'UPDATE_STATUS':
       return { ...state, todos: updateStatus(state.todos, action.payload.id, action.payload.status) }
     case 'PIN':
