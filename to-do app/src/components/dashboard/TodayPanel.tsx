@@ -1,37 +1,21 @@
 import { useState } from 'react'
 import { useTodosContext } from '../../app/TodosContext'
 import AddTaskModal from '../kanban/AddTaskModal'
+import KanbanCard from '../kanban/KanbanCard'
 import './TodayPanel.css'
 
-// Returns true when a timestamp falls on the current local calendar day.
 function isSameDay(ts: number): boolean {
-  const d = new Date(ts)
-  const now = new Date()
+  const d = new Date(ts), now = new Date()
   return d.getFullYear() === now.getFullYear()
       && d.getMonth()    === now.getMonth()
       && d.getDate()     === now.getDate()
 }
 
-const STATUS_LABEL: Record<string, string> = {
-  backlog:      'Backlog',
-  todo:         'To Do',
-  'in-progress': 'In Progress',
-  done:         'Done',
-}
-
-const STATUS_COLOR: Record<string, string> = {
-  backlog:      '#6B7280',
-  todo:         'var(--status-todo)',
-  'in-progress': 'var(--status-in-progress)',
-  done:         'var(--status-done)',
-}
-
 export default function TodayPanel() {
-  const { filteredTodos, addTodo } = useTodosContext()
+  const { filteredTodos, query, addTodo, updateStatus, deleteTodo, pinTodo } = useTodosContext()
   const [modalOpen, setModalOpen] = useState(false)
 
   const todayTodos = filteredTodos.filter(t => isSameDay(t.createdAt))
-
   const today = new Date().toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric' })
 
   return (
@@ -46,14 +30,14 @@ export default function TodayPanel() {
           <li className="today-empty">No tasks added today yet.</li>
         )}
         {todayTodos.map(todo => (
-          <li key={todo.id} className="today-item">
-            <span
-              className="today-item-dot"
-              style={{ background: STATUS_COLOR[todo.status] }}
-              aria-hidden="true"
+          <li key={todo.id}>
+            <KanbanCard
+              todo={todo}
+              query={query}
+              onUpdateStatus={updateStatus}
+              onDelete={deleteTodo}
+              onPin={pinTodo}
             />
-            <span className="today-item-title">{todo.title}</span>
-            <span className="today-item-status">{STATUS_LABEL[todo.status]}</span>
           </li>
         ))}
       </ul>

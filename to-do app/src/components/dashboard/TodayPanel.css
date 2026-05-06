@@ -44,37 +44,6 @@
   padding: 20px 0;
 }
 
-.today-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background: var(--input-bg);
-  border-radius: var(--radius-md);
-}
-
-.today-item-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.today-item-title {
-  flex: 1;
-  font-size: 0.875rem;
-  color: var(--text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.today-item-status {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
 
 .today-add-form {
   display: flex;
