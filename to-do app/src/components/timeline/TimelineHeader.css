@@ -1,11 +1,11 @@
 .tl-header {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   background: var(--bg-card);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
-  padding: 16px 20px;
+  padding: 14px 20px 0;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -16,14 +16,40 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  padding-bottom: 2px;
 }
 
-.tl-month-label {
+.tl-range-label {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-primary);
-  min-width: 140px;
+  min-width: 160px;
   text-align: center;
+}
+
+/* ── View toggle ── */
+.tl-view-toggle {
+  display: flex;
+  gap: 2px;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  margin-left: auto;
+}
+
+.tl-view-btn {
+  padding: 4px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.tl-view-btn.active {
+  background: var(--accent);
+  color: #fff;
 }
 
 .tl-nav-btn {
@@ -50,21 +76,45 @@
 
 .tl-nav-btn.icon svg { width: 16px; height: 16px; }
 
+/* ── Date row: spacer + strip side-by-side ── */
+.tl-date-row {
+  display: flex;
+  align-items: stretch;
+  border-top: 1px solid var(--border-color);
+}
+
+.tl-label-spacer {
+  width: 200px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border-color);
+}
+
 .tl-date-strip {
+  flex: 1;
   display: grid;
   grid-template-columns: repeat(var(--day-count, 30), 1fr);
-  gap: 2px;
   overflow-x: auto;
 }
 
+/* ── Date cells ── */
 .tl-date-cell {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 2px;
-  padding: 4px 2px;
-  border-radius: var(--radius-sm);
+  padding: 6px 2px;
+  border-left: 1px solid var(--border-color);
   min-width: 28px;
+  transition: background 0.15s;
+}
+
+.tl-date-cell:first-child {
+  border-left: none;
+}
+
+.tl-date-cell.weekend {
+  background: rgba(0, 0, 0, 0.025);
 }
 
 .tl-date-cell.today {
@@ -75,22 +125,30 @@
   background: var(--accent);
   color: #fff;
   border-radius: 50%;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .tl-date-dow {
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   color: var(--text-muted);
+  font-weight: 700;
   text-transform: uppercase;
-  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1;
+}
+
+.tl-date-cell.weekend .tl-date-dow {
+  color: var(--accent);
+  opacity: 0.7;
 }
 
 .tl-date-num {
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.82rem;
+  font-weight: 600;
   color: var(--text-secondary);
+  line-height: 1;
 }

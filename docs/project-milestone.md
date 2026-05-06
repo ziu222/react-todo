@@ -6,7 +6,7 @@
 - **Tasks**: CRUD, completion tracking, filters, and (later) Kanban-style organization.
 
 ## Status at a glance
-- **Current phase**: Dashboard UI is in place; next focus is end-to-end task functionality.
+- **Current phase**: Core app complete — Kanban board, Timeline, Settings, and theme system all shipped. Next focus is polish, accessibility hardening, and deploy.
 - **Definition of Done (global)**:
   - No console errors in dev
   - All user input is validated (trim, non-empty, max length)
@@ -56,47 +56,79 @@
 
 ---
 
-## Milestone 4 — Task functionality (Next)
-**Goal**: Make the dashboard real by wiring up task creation, completion, and accurate counts.
+## Milestone 4 — Task functionality (Completed)
+**When**: 2026‑05‑06 → 2026‑05‑07  
+**Outcome**: Full Kanban-based task management wired to real state and localStorage.
 
-**Scope**
-- Add task (supports quick-add in Today panel + primary add flow)
-- Toggle complete / delete
-- Derived counts for cards (Total / In Progress / Completed)
-- Basic list rendering for Today and Tasks views
-
-**Acceptance criteria**
-- Creating a task updates KPI cards immediately
-- Titles are validated: trimmed, non-empty, ≤ 500 chars
-- IDs use `crypto.randomUUID()` (no array indices as keys)
-- State persists across refresh (localStorage, safe parse + fallback)
+**Delivered**
+- Kanban board with four columns: **Backlog / To Do / In Progress / Done**
+- Add task via per-column inline form (title, color picker, start/end date, priority, tags, description, attachments)
+- Task detail modal — full-field view with edit support
+- Update status (drag-free column reassignment via modal)
+- Delete task
+- Pin task (pinned items float to top within their column)
+- Derived KPI counts on Dashboard (Total / In Progress / Completed) update in real time
+- Today panel on Dashboard shows tasks due today with quick-add
+- Auto-status: tasks whose end date has already passed are created as **Done**
+- Progress bar derived from start/end dates — never stored as redundant state
+- Search bar filters across all columns simultaneously
+- Full localStorage persistence (`todos:v1`)
 
 ---
 
-## Milestone 5 — Filters, editing, and UX polish (Planned)
+## Milestone 5 — Timeline view (Completed)
+**When**: 2026‑05‑07  
+**Outcome**: Gantt-style timeline showing task date ranges across a month or week.
+
+**Delivered**
+- Timeline page with **Month / Week** view toggle
+- Previous / Next / Today navigation
+- Each task renders as a horizontal bar spanning its `startDay → endDay`
+- Tasks without dates are listed in a separate "No date" section
+- Color-coded bars match each task's accent color
+- View is read-only (task editing lives in the Kanban detail modal)
+
+---
+
+## Milestone 6 — Settings & theme system (Completed)
+**When**: 2026‑05‑07  
+**Outcome**: Persistent user profile and multi-theme support.
+
+**Delivered**
+- Settings page with **My Details / Theme** tabs
+- Profile fields: first name, last name, email, cover color; persisted to localStorage
+- Profile banner shows avatar initials and cover color
+- Theme selector with multiple built-in themes (tokens applied via CSS variables)
+- Selected theme persisted to localStorage (`todo:theme`)
+- `UserContext` provider for profile state across the app
+
+---
+
+## Milestone 7 — Filters, editing, and UX polish (Planned)
 **Goal**: Everyday usability features without adding complex infrastructure.
 
 **Scope**
-- Filters: All / Active / Completed
-- Inline edit (Enter to save, Escape to cancel)
-- Clear completed
+- Filter sidebar / chip bar: All / Backlog / To Do / In Progress / Done
+- Inline edit directly on Kanban cards (Enter to save, Escape to cancel)
+- Clear completed column in one click
 - Empty states that look intentional (not placeholder-ish)
+- Drag-and-drop card reordering between columns
 
 **Acceptance criteria**
 - Filtered views match the underlying state (no duplicated derived state)
 - Inline edit never allows blank titles
-- Clear completed is one click and undo-safe (optional: confirm)
+- Clear completed is one click
 
 ---
 
-## Milestone 6 — Accessibility & responsiveness (Planned)
+## Milestone 8 — Accessibility & responsiveness (Planned)
 **Goal**: Keyboard-first and mobile-friendly experience.
 
 **Scope**
 - `:focus-visible` and consistent focus rings
 - Labels correctly bound (`htmlFor` / `aria-labelledby`)
-- Responsive layout (sidebar collapses on small screens)
-- Theme toggle (if already wired, ensure it’s complete and persisted)
+- Responsive layout (sidebar collapses on small screens, bottom-nav on mobile)
+- Theme toggle accessible from keyboard
 
 **Acceptance criteria**
 - Full task flow usable via keyboard only
@@ -105,7 +137,7 @@
 
 ---
 
-## Milestone 7 — Testing & release (Planned)
+## Milestone 9 — Testing & release (Planned)
 **Goal**: Confidence to iterate quickly and ship a stable build.
 
 **Scope**

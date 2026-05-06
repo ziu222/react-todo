@@ -8,6 +8,13 @@ import {
 import { loadTodos, saveTodos } from '../api/storage'
 import type { Filter, TodoStatus, Priority, Attachment } from '../model/todoLogic'
 
+interface AddSubTaskExtras {
+  date?:        number
+  startTime?:   string
+  endTime?:     string
+  description?: string
+}
+
 interface AddTodoExtras {
   status?:      TodoStatus
   color?:       string
@@ -45,7 +52,13 @@ export function useTodos() {
     updateStatus: (id: string, status: TodoStatus) => dispatch({ type: 'UPDATE_STATUS', payload: { id, status } }),
     pinTodo:      (id: string)                 => dispatch({ type: 'PIN',           payload: { id } }),
     deleteTodo:   (id: string)                 => dispatch({ type: 'DELETE',        payload: { id } }),
-    setFilter:    (filter: Filter)             => dispatch({ type: 'SET_FILTER',    payload: { filter } }),
-    setSearch:    (query: string)              => dispatch({ type: 'SET_SEARCH',    payload: { query } }),
+    setFilter:           (filter: Filter)             => dispatch({ type: 'SET_FILTER',    payload: { filter } }),
+    setSearch:           (query: string)              => dispatch({ type: 'SET_SEARCH',    payload: { query } }),
+    addSubTask:          (parentId: string, title: string, extras?: AddSubTaskExtras) =>
+      dispatch({ type: 'ADD_SUBTASK', payload: { parentId, title, ...extras } }),
+    updateSubTaskStatus: (parentId: string, subId: string, status: TodoStatus) =>
+      dispatch({ type: 'UPDATE_SUBTASK_STATUS', payload: { parentId, subId, status } }),
+    deleteSubTask:       (parentId: string, subId: string) =>
+      dispatch({ type: 'DELETE_SUBTASK', payload: { parentId, subId } }),
   }
 }

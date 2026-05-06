@@ -8,6 +8,16 @@ export interface Attachment {
   data: string   // base64 data URL
 }
 
+export interface SubTask {
+  id:           string
+  title:        string
+  status:       TodoStatus
+  startTime?:   string    // "HH:MM" local-time display string
+  endTime?:     string    // "HH:MM" local-time display string
+  description?: string
+  date?:        number    // unix ms midnight — which day this sub-task belongs to
+}
+
 export interface Todo {
   id:           string
   title:        string
@@ -21,6 +31,24 @@ export interface Todo {
   tags?:        string[]
   description?: string
   attachments?: Attachment[]
+  subTasks?:    SubTask[]
+}
+
+// ── Shared display constants
+
+export const STATUS_LABEL: Record<TodoStatus, string> = {
+  backlog:       'Backlog',
+  todo:          'To Do',
+  'in-progress': 'In Progress',
+  done:          'Done',
+}
+
+// ── Shared utilities
+
+// Normalize a date/timestamp to local midnight ms for comparison
+export function toMidnight(d: Date | number): number {
+  const dt = typeof d === 'number' ? new Date(d) : d
+  return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()).getTime()
 }
 
 // Returns 0–100. Progress is derived from dates, never stored manually.
@@ -54,6 +82,9 @@ export type TodoAction =
   | { type: 'SET_FILTER';    payload: { filter: Filter } }
   | { type: 'SET_SEARCH';    payload: { query: string } }
   | { type: 'HYDRATE';       payload: { todos: Todo[] } }
+  | { type: 'ADD_SUBTASK';           payload: { parentId: string; title: string; date?: number; startTime?: string; endTime?: string; description?: string } }
+  | { type: 'UPDATE_SUBTASK_STATUS'; payload: { parentId: string; subId: string; status: TodoStatus } }
+  | { type: 'DELETE_SUBTASK';        payload: { parentId: string; subId: string } }
 
 export const INITIAL_STATE: TodoState = { todos: [], filter: 'all', query: '' }
 
@@ -63,7 +94,7 @@ export function getDefaultColor(): string {
   )
 }
 
-// ── CRUD operations
+// ── CRUD operations — parent tasks
 
 export function addTodo(
   todos: Todo[],
@@ -73,7 +104,6 @@ export function addTodo(
   const trimmed = title.trim()
   if (!trimmed || trimmed.length > 500) return todos
 
-  // If endDay is already in the past, auto-mark as done
   const todayMs = new Date().setHours(0, 0, 0, 0)
   const autoStatus = extras?.endDay !== undefined && extras.endDay < todayMs
     ? 'done'
@@ -110,6 +140,53 @@ export function deleteTodo(todos: Todo[], id: string): Todo[] {
   return todos.filter(t => t.id !== id)
 }
 
+// ── CRUD operations — sub-tasks
+
+export function addSubTask(
+  todos: Todo[],
+  parentId: string,
+  title: string,
+  extras?: Pick<Partial<SubTask>, 'date' | 'startTime' | 'endTime' | 'description'>,
+): Todo[] {
+  const trimmed = title.trim()
+  if (!trimmed || trimmed.length > 500) return todos
+  const newSub: SubTask = {
+    id:          crypto.randomUUID(),
+    title:       trimmed,
+    status:      'todo',
+    date:        extras?.date,
+    startTime:   extras?.startTime,
+    endTime:     extras?.endTime,
+    description: extras?.description,
+  }
+  return todos.map(t =>
+    t.id === parentId
+      ? { ...t, subTasks: [...(t.subTasks ?? []), newSub] }
+      : t
+  )
+}
+
+export function updateSubTaskStatus(
+  todos: Todo[],
+  parentId: string,
+  subId: string,
+  status: TodoStatus,
+): Todo[] {
+  return todos.map(t =>
+    t.id === parentId
+      ? { ...t, subTasks: (t.subTasks ?? []).map(s => s.id === subId ? { ...s, status } : s) }
+      : t
+  )
+}
+
+export function deleteSubTask(todos: Todo[], parentId: string, subId: string): Todo[] {
+  return todos.map(t =>
+    t.id === parentId
+      ? { ...t, subTasks: (t.subTasks ?? []).filter(s => s.id !== subId) }
+      : t
+  )
+}
+
 // ── Reducer for state
 
 export function todosReducer(state: TodoState, action: TodoAction): TodoState {
@@ -130,6 +207,14 @@ export function todosReducer(state: TodoState, action: TodoAction): TodoState {
       return { ...state, query: action.payload.query }
     case 'HYDRATE':
       return { ...state, todos: action.payload.todos }
+    case 'ADD_SUBTASK': {
+      const { parentId, title, ...extras } = action.payload
+      return { ...state, todos: addSubTask(state.todos, parentId, title, extras) }
+    }
+    case 'UPDATE_SUBTASK_STATUS':
+      return { ...state, todos: updateSubTaskStatus(state.todos, action.payload.parentId, action.payload.subId, action.payload.status) }
+    case 'DELETE_SUBTASK':
+      return { ...state, todos: deleteSubTask(state.todos, action.payload.parentId, action.payload.subId) }
   }
 }
 
