@@ -16,6 +16,7 @@ export interface SubTask {
   endTime?:     string    // "HH:MM" local-time display string
   description?: string
   date?:        number    // unix ms midnight — which day this sub-task belongs to
+  category?:    string
 }
 
 export interface Todo {
@@ -112,7 +113,7 @@ export type TodoAction =
   | { type: 'SET_FILTER';    payload: { filter: Filter } }
   | { type: 'SET_SEARCH';    payload: { query: string } }
   | { type: 'HYDRATE';       payload: { todos: Todo[] } }
-  | { type: 'ADD_SUBTASK';           payload: { parentId: string; title: string; date?: number; startTime?: string; endTime?: string; description?: string } }
+  | { type: 'ADD_SUBTASK';           payload: { parentId: string; title: string; date?: number; startTime?: string; endTime?: string; description?: string; category?: string } }
   | { type: 'UPDATE_SUBTASK_STATUS'; payload: { parentId: string; subId: string; status: TodoStatus } }
   | { type: 'DELETE_SUBTASK';        payload: { parentId: string; subId: string } }
   | { type: 'SYNC_STATUS';           payload: { todayMs: number } }
@@ -182,7 +183,7 @@ export function addSubTask(
   todos: Todo[],
   parentId: string,
   title: string,
-  extras?: Pick<Partial<SubTask>, 'date' | 'startTime' | 'endTime' | 'description'>,
+  extras?: Pick<Partial<SubTask>, 'date' | 'startTime' | 'endTime' | 'description' | 'category'>,
 ): Todo[] {
   const trimmed = title.trim()
   if (!trimmed || trimmed.length > 500) return todos

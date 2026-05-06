@@ -35,6 +35,7 @@ function isValidTodo(item: unknown): item is Todo {
       if (sub.endTime     !== undefined && typeof sub.endTime     !== 'string') return false
       if (sub.description !== undefined && typeof sub.description !== 'string') return false
       if (sub.date        !== undefined && typeof sub.date        !== 'number') return false
+      if (sub.category    !== undefined && typeof sub.category    !== 'string') return false
     }
   }
   return true
