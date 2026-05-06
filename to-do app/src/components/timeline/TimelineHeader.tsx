@@ -10,6 +10,8 @@ interface TimelineHeaderProps {
   onToday:      () => void
 }
 
+const DOW = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
+
 export default function TimelineHeader({ visibleDays, viewMode, onViewChange, onPrev, onNext, onToday }: TimelineHeaderProps) {
   const today = new Date()
 
@@ -56,16 +58,24 @@ export default function TimelineHeader({ visibleDays, viewMode, onViewChange, on
         </div>
       </div>
 
-      <div className="tl-date-strip" role="row" aria-label="Days">
-        {visibleDays.map(d => {
-          const isToday = d.toDateString() === today.toDateString()
-          return (
-            <div key={d.toISOString()} className={`tl-date-cell${isToday ? ' today' : ''}`} aria-current={isToday ? 'date' : undefined}>
-              <span className="tl-date-dow">{d.toLocaleDateString('en', { weekday: 'narrow' })}</span>
-              <span className="tl-date-num">{d.getDate()}</span>
-            </div>
-          )
-        })}
+      <div className="tl-date-row">
+        <div className="tl-label-spacer" />
+        <div className="tl-date-strip" role="row" aria-label="Days">
+          {visibleDays.map(d => {
+            const isToday   = d.toDateString() === today.toDateString()
+            const isWeekend = d.getDay() === 0 || d.getDay() === 6
+            return (
+              <div
+                key={d.toISOString()}
+                className={`tl-date-cell${isToday ? ' today' : ''}${isWeekend ? ' weekend' : ''}`}
+                aria-current={isToday ? 'date' : undefined}
+              >
+                <span className="tl-date-dow">{DOW[d.getDay()]}</span>
+                <span className="tl-date-num">{d.getDate()}</span>
+              </div>
+            )
+          })}
+        </div>
       </div>
     </div>
   )
