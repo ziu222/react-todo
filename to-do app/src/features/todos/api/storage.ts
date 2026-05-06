@@ -23,6 +23,20 @@ function isValidTodo(item: unknown): item is Todo {
   if (t.tags        !== undefined && !Array.isArray(t.tags))             return false
   if (t.description !== undefined && typeof t.description !== 'string')  return false
   if (t.attachments !== undefined && !Array.isArray(t.attachments))      return false
+  if (t.subTasks !== undefined) {
+    if (!Array.isArray(t.subTasks)) return false
+    for (const s of t.subTasks as unknown[]) {
+      if (typeof s !== 'object' || s === null) return false
+      const sub = s as Record<string, unknown>
+      if (typeof sub.id    !== 'string') return false
+      if (typeof sub.title !== 'string') return false
+      if (typeof sub.status !== 'string' || !VALID_STATUSES.includes(sub.status as TodoStatus)) return false
+      if (sub.startTime   !== undefined && typeof sub.startTime   !== 'string') return false
+      if (sub.endTime     !== undefined && typeof sub.endTime     !== 'string') return false
+      if (sub.description !== undefined && typeof sub.description !== 'string') return false
+      if (sub.date        !== undefined && typeof sub.date        !== 'number') return false
+    }
+  }
   return true
 }
 
