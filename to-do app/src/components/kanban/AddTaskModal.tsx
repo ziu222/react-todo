@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 import type { TodoStatus, Priority, Attachment } from '../../features/todos/model/todoLogic'
-import { calcProgress } from '../../features/todos/model/todoLogic'
+import { calcProgressPreview } from '../../features/todos/model/todoLogic'
 import './AddTaskModal.css'
 
 const PRESET_TAGS = ['Planning', 'Research', 'Content', 'Development', 'Design', 'Marketing']
@@ -90,7 +90,7 @@ export default function AddTaskModal({ initialStatus, onClose, onSubmit }: AddTa
   const endMs        = endDay   ? dateStrToMs(endDay)   : null
   const todayMs      = new Date().setHours(0, 0, 0, 0)
   const autoProgress = startMs !== null && endMs !== null && endMs >= startMs
-    ? calcProgress(startMs, endMs)
+    ? calcProgressPreview(startMs, endMs)
     : null
   const willBeDone   = endMs !== null && endMs < todayMs
 

@@ -20,9 +20,7 @@ export default function TimelineRow({ todo, visibleDays, onOpenDetail, onDayClic
 
   const pillVisible = startMs <= lastMs && endMs >= firstMs
 
-  const progress = todo.startDay != null && todo.endDay != null
-    ? calcProgress(todo.startDay, todo.endDay)
-    : 0
+  const progress = calcProgress(todo)
 
   const clampedStart = Math.max(startMs, firstMs)
   const clampedEnd   = Math.min(endMs,   lastMs)

@@ -34,8 +34,6 @@ export interface Todo {
   subTasks?:    SubTask[]
 }
 
-// ── Shared display constants
-
 export const STATUS_LABEL: Record<TodoStatus, string> = {
   backlog:       'Backlog',
   todo:          'To Do',
@@ -43,20 +41,33 @@ export const STATUS_LABEL: Record<TodoStatus, string> = {
   done:          'Done',
 }
 
-// ── Shared utilities
-
 // Normalize a date/timestamp to local midnight ms for comparison
 export function toMidnight(d: Date | number): number {
   const dt = typeof d === 'number' ? new Date(d) : d
   return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()).getTime()
 }
 
-// Returns 0–100. Progress is derived from dates, never stored manually.
-export function calcProgress(startDay: number, endDay: number): number {
+// Option B: sub-task based when subTasks exist, date-based fallback capped at 99 until done
+export function calcProgress(todo: Todo): number {
+  if (todo.subTasks && todo.subTasks.length > 0) {
+    const done = todo.subTasks.filter(s => s.status === 'done').length
+    return Math.round((done / todo.subTasks.length) * 100)
+  }
+  if (todo.startDay == null || todo.endDay == null) return 0
+  if (todo.status === 'done') return 100
   const todayMs = new Date().setHours(0, 0, 0, 0)
-  if (todayMs < startDay) return 0
-  if (startDay === endDay || todayMs >= endDay) return 100
-  return Math.round(((todayMs - startDay) / (endDay - startDay)) * 100)
+  if (todayMs <= todo.startDay) return 0
+  return Math.min(99, Math.round(
+    ((todayMs - todo.startDay) / (todo.endDay - todo.startDay)) * 100
+  ))
+}
+
+// Date-only preview — used in AddTaskModal before a Todo object exists
+export function calcProgressPreview(startDay: number, endDay: number): number {
+  if (startDay === endDay) return 0
+  const todayMs = new Date().setHours(0, 0, 0, 0)
+  if (todayMs <= startDay) return 0
+  return Math.min(99, Math.round(((todayMs - startDay) / (endDay - startDay)) * 100))
 }
 
 export interface TodoState {
@@ -187,7 +198,7 @@ export function deleteSubTask(todos: Todo[], parentId: string, subId: string): T
   )
 }
 
-// ── Reducer for state
+// ── Reducer
 
 export function todosReducer(state: TodoState, action: TodoAction): TodoState {
   switch (action.type) {
