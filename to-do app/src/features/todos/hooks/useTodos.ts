@@ -35,6 +35,7 @@ export function useTodos() {
   useEffect(() => {
     const saved = loadTodos()
     if (saved !== null) dispatch({ type: 'HYDRATE', payload: { todos: saved } })
+    dispatch({ type: 'SYNC_STATUS', payload: { todayMs: new Date().setHours(0, 0, 0, 0) } })
     hydratedRef.current = true
   }, [])
 
