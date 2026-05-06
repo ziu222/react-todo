@@ -303,7 +303,12 @@
 
 .dv-add-btn:hover { opacity: 1; }
 
-.dv-add-row { padding: 2px 0; }
+.dv-add-row {
+  padding: 2px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
 .dv-add-input {
   width: 100%;
@@ -319,6 +324,80 @@
 .dv-add-input:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-subtle);
+}
+
+/* ── Time + category rows in add form ── */
+.dv-time-row,
+.dv-cat-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dv-time-lbl {
+  font-size: 0.67rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  min-width: 22px;
+}
+
+.dv-time-input {
+  flex: 1;
+  font-size: 0.72rem;
+  color: var(--text-primary);
+  background: var(--input-bg);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 3px 6px;
+  outline: none;
+  min-width: 0;
+}
+
+.dv-time-input:focus {
+  border-color: var(--accent);
+}
+
+.dv-cat-input {
+  flex: 1;
+  font-size: 0.72rem;
+  color: var(--text-primary);
+  background: var(--input-bg);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 3px 6px;
+  outline: none;
+  min-width: 0;
+}
+
+.dv-cat-input:focus {
+  border-color: var(--accent);
+}
+
+/* ── Category header in sub-task list ── */
+.dv-cat-header {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  padding: 6px 0 2px;
+  list-style: none;
+}
+
+/* ── Sub-task time progress mini-bar ── */
+.dv-sub-time-track {
+  flex: 1;
+  height: 3px;
+  background: var(--border-color);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 0 4px;
+}
+
+.dv-sub-time-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s ease;
 }
 
 /* ── Responsive ── */

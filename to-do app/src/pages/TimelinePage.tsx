@@ -134,7 +134,9 @@ export default function TimelinePage() {
         <DayView
           selectedDayMs={selectedDayMs}
           todos={filteredTodos}
-          onAddSubTask={(parentId, title, date) => addSubTask(parentId, title, { date })}
+          onAddSubTask={(parentId, title, date, startTime, endTime, category) =>
+            addSubTask(parentId, title, { date, startTime, endTime, category })
+          }
           onUpdateSubTaskStatus={updateSubTaskStatus}
           onDeleteSubTask={deleteSubTask}
         />

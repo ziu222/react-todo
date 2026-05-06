@@ -6,17 +6,33 @@ import './DayView.css'
 interface DayViewProps {
   selectedDayMs:         number
   todos:                 Todo[]
-  onAddSubTask:          (parentId: string, title: string, date: number) => void
+  onAddSubTask:          (parentId: string, title: string, date: number, startTime?: string, endTime?: string, category?: string) => void
   onUpdateSubTaskStatus: (parentId: string, subId: string, status: TodoStatus) => void
   onDeleteSubTask:       (parentId: string, subId: string) => void
 }
 
-const DAY_NAMES  = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+const DAY_NAMES   = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
 function formatDayHeader(ms: number) {
   const d = new Date(ms)
   return { day: DAY_NAMES[d.getDay()], date: `${MONTH_SHORT[d.getMonth()]} ${d.getDate()}` }
+}
+
+function parseHHMM(t: string): number {
+  const [h, m] = t.split(':').map(Number)
+  return h * 60 + (m ?? 0)
+}
+
+function calcSubTaskTimeProgress(sub: SubTask): number {
+  if (!sub.startTime || !sub.endTime) return 0
+  const now  = new Date()
+  const nowM = now.getHours() * 60 + now.getMinutes()
+  const s    = parseHHMM(sub.startTime)
+  const e    = parseHHMM(sub.endTime)
+  if (nowM <= s) return 0
+  if (nowM >= e) return 100
+  return Math.round(((nowM - s) / (e - s)) * 100)
 }
 
 function ChevronIcon({ open }: { open: boolean }) {
@@ -36,15 +52,18 @@ function ChevronIcon({ open }: { open: boolean }) {
 interface DayTaskCardProps {
   todo:                  Todo
   selectedDayMs:         number
-  onAddSubTask:          (parentId: string, title: string, date: number) => void
+  onAddSubTask:          (parentId: string, title: string, date: number, startTime?: string, endTime?: string, category?: string) => void
   onUpdateSubTaskStatus: (parentId: string, subId: string, status: TodoStatus) => void
   onDeleteSubTask:       (parentId: string, subId: string) => void
 }
 
 function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus, onDeleteSubTask }: DayTaskCardProps) {
-  const [expanded,     setExpanded]     = useState(false)
+  const [expanded,      setExpanded]      = useState(false)
   const [addingSubTask, setAddingSubTask] = useState(false)
-  const [newSubTitle,  setNewSubTitle]  = useState('')
+  const [newSubTitle,   setNewSubTitle]   = useState('')
+  const [newStartTime,  setNewStartTime]  = useState('')
+  const [newEndTime,    setNewEndTime]    = useState('')
+  const [newCategory,   setNewCategory]   = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   const daySubTasks: SubTask[] = (todo.subTasks ?? []).filter(s =>
@@ -55,8 +74,8 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
   const totalCount = daySubTasks.length
   const progress   = calcProgress(todo)
 
-  const firstTime  = daySubTasks.find(s => s.startTime)
-  const timeLabel  = firstTime
+  const firstTime = daySubTasks.find(s => s.startTime)
+  const timeLabel = firstTime
     ? `${firstTime.startTime}${firstTime.endTime ? ` – ${firstTime.endTime}` : ''}`
     : 'All day'
 
@@ -67,29 +86,42 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
     if (addingSubTask) inputRef.current?.focus()
   }, [addingSubTask])
 
+  function resetAddForm() {
+    setNewSubTitle(''); setNewStartTime(''); setNewEndTime(''); setNewCategory('')
+    setAddingSubTask(false)
+  }
+
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') {
       const val = newSubTitle.trim()
-      if (val) onAddSubTask(todo.id, val, selectedDayMs)
-      setNewSubTitle('')
-      setAddingSubTask(false)
+      if (val) onAddSubTask(
+        todo.id, val, selectedDayMs,
+        newStartTime || undefined,
+        newEndTime   || undefined,
+        newCategory.trim() || undefined,
+      )
+      resetAddForm()
     }
-    if (e.key === 'Escape') {
-      setNewSubTitle('')
-      setAddingSubTask(false)
-    }
+    if (e.key === 'Escape') resetAddForm()
   }
 
   function toggleSubStatus(sub: SubTask) {
     onUpdateSubTaskStatus(todo.id, sub.id, sub.status === 'done' ? 'todo' : 'done')
   }
 
+  // Group sub-tasks by category (null = no category)
+  const grouped: { label: string | null; items: SubTask[] }[] = []
+  const seen = new Map<string | null, SubTask[]>()
+  for (const s of daySubTasks) {
+    const key = s.category ?? null
+    if (!seen.has(key)) { seen.set(key, []); grouped.push({ label: key, items: seen.get(key)! }) }
+    seen.get(key)!.push(s)
+  }
+
   return (
     <div className={`dv-card${isDone ? ' done' : ''}`} style={{ '--card-color': color } as React.CSSProperties}>
-      {/* Color accent bar at top */}
       <div className="dv-card-bar" />
 
-      {/* Header: status badge + time */}
       <div className="dv-card-head">
         <span className="dv-status-badge" style={{ background: `${color}18`, color }}>
           {STATUS_LABEL[todo.status]}
@@ -97,15 +129,12 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
         <span className="dv-time-label">{timeLabel}</span>
       </div>
 
-      {/* Title */}
       <p className="dv-card-title">{todo.title}</p>
 
-      {/* Description */}
       {todo.description && (
         <p className="dv-card-desc">{todo.description}</p>
       )}
 
-      {/* Progress bar */}
       <div className="dv-progress-row">
         <div className="dv-progress-track">
           <div className="dv-progress-fill" style={{ width: `${progress}%`, background: color }} />
@@ -113,7 +142,6 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
         <span className="dv-progress-pct">{progress}%</span>
       </div>
 
-      {/* Sub-task toggle */}
       <button
         className="dv-subtask-toggle"
         onClick={() => setExpanded(e => !e)}
@@ -123,33 +151,45 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
         {totalCount > 0 ? `${doneCount}/${totalCount} sub-tasks` : '0 sub-tasks'}
       </button>
 
-      {/* Sub-task list */}
       {expanded && (
         <ul className="dv-subtask-list">
-          {daySubTasks.map(sub => (
-            <li key={sub.id} className="dv-subtask-row">
-              <button
-                className={`dv-check${sub.status === 'done' ? ' done' : ''}`}
-                style={{ '--check-color': color } as React.CSSProperties}
-                onClick={() => toggleSubStatus(sub)}
-                aria-label={sub.status === 'done' ? 'Mark incomplete' : 'Mark complete'}
-              >
-                {sub.status === 'done' && (
-                  <svg viewBox="0 0 10 10" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
-                    <path d="M2 5l2.5 2.5L8 3" />
-                  </svg>
-                )}
-              </button>
-              <span className={`dv-sub-title${sub.status === 'done' ? ' done' : ''}`}>{sub.title}</span>
-              {sub.startTime && (
-                <span className="dv-sub-time">{sub.startTime}{sub.endTime ? ` – ${sub.endTime}` : ''}</span>
-              )}
-              <button
-                className="dv-sub-del"
-                onClick={() => onDeleteSubTask(todo.id, sub.id)}
-                aria-label="Delete"
-              >×</button>
-            </li>
+          {grouped.map(({ label, items }) => (
+            <>
+              {label && <li key={`cat-${label}`} className="dv-cat-header">#{label}</li>}
+              {items.map(sub => (
+                <li key={sub.id} className="dv-subtask-row">
+                  <button
+                    className={`dv-check${sub.status === 'done' ? ' done' : ''}`}
+                    style={{ '--check-color': color } as React.CSSProperties}
+                    onClick={() => toggleSubStatus(sub)}
+                    aria-label={sub.status === 'done' ? 'Mark incomplete' : 'Mark complete'}
+                  >
+                    {sub.status === 'done' && (
+                      <svg viewBox="0 0 10 10" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
+                        <path d="M2 5l2.5 2.5L8 3" />
+                      </svg>
+                    )}
+                  </button>
+                  <span className={`dv-sub-title${sub.status === 'done' ? ' done' : ''}`}>{sub.title}</span>
+                  {sub.startTime && (
+                    <span className="dv-sub-time">{sub.startTime}{sub.endTime ? ` – ${sub.endTime}` : ''}</span>
+                  )}
+                  {sub.startTime && sub.endTime && sub.status !== 'done' && (
+                    <div className="dv-sub-time-track">
+                      <div
+                        className="dv-sub-time-fill"
+                        style={{ width: `${calcSubTaskTimeProgress(sub)}%`, background: color }}
+                      />
+                    </div>
+                  )}
+                  <button
+                    className="dv-sub-del"
+                    onClick={() => onDeleteSubTask(todo.id, sub.id)}
+                    aria-label="Delete"
+                  >×</button>
+                </li>
+              ))}
+            </>
           ))}
 
           {!isDone && (
@@ -165,6 +205,33 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
                   onKeyDown={handleKeyDown}
                   maxLength={500}
                 />
+                <div className="dv-time-row">
+                  <span className="dv-time-lbl">From</span>
+                  <input
+                    className="dv-time-input"
+                    type="time"
+                    value={newStartTime}
+                    onChange={e => setNewStartTime(e.target.value)}
+                  />
+                  <span className="dv-time-lbl">To</span>
+                  <input
+                    className="dv-time-input"
+                    type="time"
+                    value={newEndTime}
+                    onChange={e => setNewEndTime(e.target.value)}
+                  />
+                </div>
+                <div className="dv-cat-row">
+                  <span className="dv-time-lbl">#</span>
+                  <input
+                    className="dv-cat-input"
+                    type="text"
+                    placeholder="Category (optional)"
+                    value={newCategory}
+                    onChange={e => setNewCategory(e.target.value)}
+                    maxLength={50}
+                  />
+                </div>
               </li>
             ) : (
               <li>
