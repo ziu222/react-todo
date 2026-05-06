@@ -1,7 +1,19 @@
 import { useState } from 'react'
-import type { Todo, TodoStatus } from '../../features/todos/model/todoLogic'
+import type { Todo, TodoStatus, Priority, Attachment } from '../../features/todos/model/todoLogic'
 import KanbanCard from './KanbanCard'
+import AddTaskModal from './AddTaskModal'
 import './KanbanColumn.css'
+
+export interface AddTaskData {
+  title:        string
+  status:       TodoStatus
+  dueDate?:     number
+  priority?:    Priority
+  tags?:        string[]
+  description?: string
+  progress?:    number
+  attachments?: Attachment[]
+}
 
 interface KanbanColumnProps {
   status:         TodoStatus
@@ -9,7 +21,7 @@ interface KanbanColumnProps {
   accentColor:    string
   todos:          Todo[]
   query:          string
-  onAdd:          (title: string) => void
+  onAdd:          (data: AddTaskData) => void
   onUpdateStatus: (id: string, status: TodoStatus) => void
   onDelete:       (id: string) => void
   onPin:          (id: string) => void
@@ -19,16 +31,7 @@ export default function KanbanColumn({
   status, label, accentColor, todos, query,
   onAdd, onUpdateStatus, onDelete, onPin,
 }: KanbanColumnProps) {
-  const [adding, setAdding] = useState(false)
-  const [input,  setInput]  = useState('')
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!input.trim()) return
-    onAdd(input.trim())
-    setInput('')
-    setAdding(false)
-  }
+  const [modalOpen, setModalOpen] = useState(false)
 
   return (
     <section className="kanban-column" data-status={status}>
@@ -40,7 +43,7 @@ export default function KanbanColumn({
         </div>
         <button
           className="kanban-column-add-btn"
-          onClick={() => setAdding(v => !v)}
+          onClick={() => setModalOpen(true)}
           aria-label={`Add task to ${label}`}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
@@ -49,27 +52,8 @@ export default function KanbanColumn({
         </button>
       </header>
 
-      {adding && (
-        <form className="kanban-column-form" onSubmit={handleSubmit}>
-          <input
-            autoFocus
-            className="kanban-column-input"
-            type="text"
-            placeholder="Task title…"
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === 'Escape' && setAdding(false)}
-            maxLength={500}
-          />
-          <div className="kanban-column-form-actions">
-            <button type="submit" className="kanban-form-btn primary">Add</button>
-            <button type="button" className="kanban-form-btn" onClick={() => setAdding(false)}>Cancel</button>
-          </div>
-        </form>
-      )}
-
       <ul className="kanban-column-list">
-        {todos.length === 0 && !adding && (
+        {todos.length === 0 && (
           <li className="kanban-column-empty">No tasks here</li>
         )}
         {todos.map(todo => (
@@ -84,6 +68,14 @@ export default function KanbanColumn({
           </li>
         ))}
       </ul>
+
+      {modalOpen && (
+        <AddTaskModal
+          initialStatus={status}
+          onClose={() => setModalOpen(false)}
+          onSubmit={data => onAdd(data)}
+        />
+      )}
     </section>
   )
 }

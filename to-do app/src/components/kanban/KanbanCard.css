@@ -20,6 +20,14 @@
   border-left: 3px solid var(--accent);
 }
 
+/* ── Chips row (category + priority) ── */
+.kanban-card-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
 .kanban-card-chip {
   display: inline-flex;
   align-items: center;
@@ -29,7 +37,6 @@
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: capitalize;
-  width: fit-content;
 }
 
 .kanban-card-dot {
@@ -39,6 +46,18 @@
   flex-shrink: 0;
 }
 
+.kanban-card-priority {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.03em;
+}
+
+/* ── Title ── */
 .kanban-card-title {
   font-size: 0.875rem;
   font-weight: 500;
@@ -47,6 +66,54 @@
   word-break: break-word;
 }
 
+/* ── Extra tags ── */
+.kanban-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.kanban-card-tag {
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+}
+
+/* ── Progress ── */
+.kanban-card-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kanban-card-progress-track {
+  flex: 1;
+  height: 4px;
+  background: var(--border-color);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.kanban-card-progress-bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.kanban-card-progress-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 28px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── Footer ── */
 .kanban-card-footer {
   display: flex;
   align-items: center;
@@ -54,10 +121,18 @@
 }
 
 .kanban-card-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 0.72rem;
   color: var(--text-muted);
 }
 
+.kanban-card-date svg { width: 11px; height: 11px; }
+
+.kanban-card-date.overdue { color: #EF4444; }
+
+/* ── Actions ── */
 .kanban-card-actions {
   display: flex;
   gap: 2px;
