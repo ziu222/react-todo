@@ -6,7 +6,18 @@ import {
   selectCounts,
 } from '../model/todoLogic'
 import { loadTodos, saveTodos } from '../api/storage'
-import type { Filter, TodoStatus } from '../model/todoLogic'
+import type { Filter, TodoStatus, Priority, Attachment } from '../model/todoLogic'
+
+interface AddTodoExtras {
+  status?:      TodoStatus
+  color?:       string
+  dueDate?:     number
+  priority?:    Priority
+  tags?:        string[]
+  description?: string
+  progress?:    number
+  attachments?: Attachment[]
+}
 
 export function useTodos() {
   const [state, dispatch] = useReducer(todosReducer, INITIAL_STATE)
@@ -30,7 +41,7 @@ export function useTodos() {
     counts:        selectCounts(state.todos),
     filter:        state.filter,
     query:         state.query,
-    addTodo:      (title: string)              => dispatch({ type: 'ADD',           payload: { title } }),
+    addTodo:      (title: string, extras?: AddTodoExtras) => dispatch({ type: 'ADD', payload: { title, ...extras } }),
     updateStatus: (id: string, status: TodoStatus) => dispatch({ type: 'UPDATE_STATUS', payload: { id, status } }),
     pinTodo:      (id: string)                 => dispatch({ type: 'PIN',           payload: { id } }),
     deleteTodo:   (id: string)                 => dispatch({ type: 'DELETE',        payload: { id } }),

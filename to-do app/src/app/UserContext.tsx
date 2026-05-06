@@ -6,6 +6,7 @@ interface User {
   email:      string
   avatar:     string | null
   coverColor: string
+  coverImage: string | null
 }
 
 const DEFAULT_USER: User = {
@@ -14,16 +15,18 @@ const DEFAULT_USER: User = {
   email:      'btn2812@gmail.com',
   avatar:     null,
   coverColor: 'linear-gradient(135deg, #a78bfa 0%, #3b82f6 100%)',
+  coverImage: null,
 }
 
 interface UserContextValue {
-  user:          User
-  initials:      string
-  setFirstName:  (v: string) => void
-  setLastName:   (v: string) => void
-  setEmail:      (v: string) => void
-  setAvatar:     (v: string | null) => void
-  setCoverColor: (v: string) => void
+  user:           User
+  initials:       string
+  setFirstName:   (v: string) => void
+  setLastName:    (v: string) => void
+  setEmail:       (v: string) => void
+  setAvatar:      (v: string | null) => void
+  setCoverColor:  (v: string) => void
+  setCoverImage:  (v: string | null) => void
 }
 
 const UserContext = createContext<UserContextValue | null>(null)
@@ -57,6 +60,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       setEmail:      (v) => setUser(u => ({ ...u, email: v })),
       setAvatar:     (v) => setUser(u => ({ ...u, avatar: v })),
       setCoverColor: (v) => setUser(u => ({ ...u, coverColor: v })),
+      setCoverImage: (v) => setUser(u => ({ ...u, coverImage: v })),
     }}>
       {children}
     </UserContext.Provider>
