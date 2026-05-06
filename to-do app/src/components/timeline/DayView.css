@@ -1,0 +1,253 @@
+/* ── Panel shell ── */
+.dv-panel {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: background var(--transition-normal);
+  max-height: calc(100vh - 200px);
+}
+
+.dv-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.dv-date-label {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dv-task-count {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.dv-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dv-empty {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  text-align: center;
+  padding: 32px 0;
+}
+
+/* ── Task card ── */
+.dv-card {
+  background: var(--bg-card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--card-accent, var(--border-color));
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transition: box-shadow var(--transition-fast);
+}
+
+.dv-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.dv-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dv-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.dv-time-range {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.dv-card-title {
+  font-size: 0.855rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+.dv-card-desc {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* ── Sub-task toggle button ── */
+.dv-subtask-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  padding: 2px 0;
+  transition: color var(--transition-fast);
+}
+
+.dv-subtask-toggle:hover { color: var(--accent); }
+
+.dv-chevron {
+  display: flex;
+  align-items: center;
+}
+
+.dv-chevron svg {
+  width: 12px;
+  height: 12px;
+  transition: transform var(--transition-fast);
+}
+
+.dv-chevron.open svg { transform: rotate(180deg); }
+
+/* ── Sub-task list ── */
+.dv-subtask-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+  padding-left: 6px;
+  border-left: 2px solid var(--border-color);
+}
+
+.dv-subtask-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 2px;
+  border-radius: var(--radius-sm);
+}
+
+.dv-subtask-row:hover .dv-subtask-delete { opacity: 1; }
+
+/* Checkbox */
+.dv-subtask-check {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1.5px solid var(--border-color);
+  flex-shrink: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.dv-subtask-check.done {
+  background: #10B981;
+  border-color: #10B981;
+}
+
+.dv-subtask-title {
+  flex: 1;
+  font-size: 0.79rem;
+  color: var(--text-primary);
+  transition: color var(--transition-fast);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dv-subtask-title.done {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.dv-subtask-time {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.dv-subtask-delete {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  flex-shrink: 0;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
+  line-height: 1;
+}
+
+.dv-subtask-delete:hover { color: #EF4444; }
+
+/* ── Inline add ── */
+.dv-add-subtask-btn {
+  font-size: 0.76rem;
+  color: var(--accent);
+  padding: 4px 2px;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.dv-add-subtask-btn:hover { opacity: 1; }
+
+.dv-subtask-add-row { padding: 2px 0; }
+
+.dv-subtask-input {
+  width: 100%;
+  font-size: 0.79rem;
+  color: var(--text-primary);
+  background: var(--input-bg);
+  border: 1px solid var(--accent-light);
+  border-radius: var(--radius-sm);
+  padding: 5px 8px;
+  outline: none;
+}
+
+.dv-subtask-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-subtle);
+}
+
+/* ── Responsive ── */
+@media (max-width: 960px) {
+  .dv-panel {
+    width: 100%;
+    max-height: 320px;
+  }
+}

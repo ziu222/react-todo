@@ -4,7 +4,16 @@
   gap: 16px;
 }
 
-.timeline-body {
+/* ── Two-column layout ── */
+.timeline-split {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.timeline-gantt {
+  flex: 1;
+  min-width: 0;   /* prevent flex blowout */
   background: var(--bg-card);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
@@ -18,4 +27,11 @@
   text-align: center;
   color: var(--text-muted);
   font-size: 0.875rem;
+}
+
+/* ── Responsive: stack on narrow screens ── */
+@media (max-width: 960px) {
+  .timeline-split {
+    flex-direction: column;
+  }
 }
