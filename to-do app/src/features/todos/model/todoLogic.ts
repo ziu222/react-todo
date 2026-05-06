@@ -47,14 +47,14 @@ export function toMidnight(d: Date | number): number {
   return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()).getTime()
 }
 
-// Option B: sub-task based when subTasks exist, date-based fallback capped at 99 until done
+// Option B: done=100 always first, then sub-task completion%, then date-based capped at 99
 export function calcProgress(todo: Todo): number {
+  if (todo.status === 'done') return 100
   if (todo.subTasks && todo.subTasks.length > 0) {
     const done = todo.subTasks.filter(s => s.status === 'done').length
     return Math.round((done / todo.subTasks.length) * 100)
   }
   if (todo.startDay == null || todo.endDay == null) return 0
-  if (todo.status === 'done') return 100
   const todayMs = new Date().setHours(0, 0, 0, 0)
   if (todayMs <= todo.startDay) return 0
   return Math.min(99, Math.round(
