@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import type { Todo, TodoStatus, Priority } from '../../features/todos/model/todoLogic'
 import { calcProgress } from '../../features/todos/model/todoLogic'
 import { highlightMatchingText } from '../../features/todos/utils/highlightMatchingText'
+import TaskDetailModal from './TaskDetailModal'
 import './KanbanCard.css'
 
 interface KanbanCardProps {
@@ -114,6 +115,7 @@ const fmt = (ms: number) =>
   new Date(ms).toLocaleDateString('en', { month: 'short', day: 'numeric' })
 
 export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onPin }: KanbanCardProps) {
+  const [detailOpen, setDetailOpen] = useState(false)
   const nextStatus = STATUS_NEXT[todo.status]
   const todayMs    = new Date().setHours(0, 0, 0, 0)
   const progress   = todo.startDay != null && todo.endDay != null
@@ -122,7 +124,13 @@ export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onPi
   const isOverdue  = todo.endDay != null && todo.endDay < todayMs && todo.status !== 'done'
 
   return (
-    <article className={`kc-card${todo.pinned ? ' pinned' : ''}`} data-status={todo.status}>
+    <>
+    <article
+      className={`kc-card${todo.pinned ? ' pinned' : ''}`}
+      data-status={todo.status}
+      onClick={() => setDetailOpen(true)}
+      style={{ cursor: 'pointer' }}
+    >
 
       {/* ── Left: status orb + dates ── */}
       <div className="kc-left">
@@ -192,7 +200,7 @@ export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onPi
         <div className="kc-actions">
           <button
             className={`kc-btn${todo.pinned ? ' active' : ''}`}
-            onClick={() => onPin(todo.id)}
+            onClick={e => { e.stopPropagation(); onPin(todo.id) }}
             aria-label={todo.pinned ? 'Unpin' : 'Pin'}
           >
             <IconPin filled={todo.pinned} />
@@ -200,7 +208,7 @@ export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onPi
           {nextStatus && (
             <button
               className="kc-btn"
-              onClick={() => onUpdateStatus(todo.id, nextStatus)}
+              onClick={e => { e.stopPropagation(); onUpdateStatus(todo.id, nextStatus) }}
               aria-label={`Move to ${nextStatus}`}
             >
               <IconArrow />
@@ -208,7 +216,7 @@ export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onPi
           )}
           <button
             className="kc-btn delete"
-            onClick={() => onDelete(todo.id)}
+            onClick={e => { e.stopPropagation(); onDelete(todo.id) }}
             aria-label="Delete task"
           >
             <IconTrash />
@@ -217,5 +225,16 @@ export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onPi
       </div>
 
     </article>
+
+    {detailOpen && (
+      <TaskDetailModal
+        todo={todo}
+        onClose={() => setDetailOpen(false)}
+        onUpdateStatus={onUpdateStatus}
+        onDelete={onDelete}
+        onPin={onPin}
+      />
+    )}
+    </>
   )
 }
