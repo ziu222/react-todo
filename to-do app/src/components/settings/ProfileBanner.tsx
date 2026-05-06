@@ -11,30 +11,47 @@ function IconCamera() {
   )
 }
 
-export default function ProfileBanner() {
-  const { user, initials, setAvatar } = useUserContext()
-  const inputRef = useRef<HTMLInputElement>(null)
+function readFile(file: File, onLoad: (result: string) => void) {
+  const reader = new FileReader()
+  reader.onload = ev => { if (ev.target?.result) onLoad(ev.target.result as string) }
+  reader.readAsDataURL(file)
+}
 
-  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = ev => setAvatar(ev.target?.result as string)
-    reader.readAsDataURL(file)
-  }
+export default function ProfileBanner() {
+  const { user, initials, setAvatar, setCoverImage } = useUserContext()
+  const avatarInputRef = useRef<HTMLInputElement>(null)
+  const coverInputRef  = useRef<HTMLInputElement>(null)
+
+  const coverStyle = user.coverImage
+    ? { backgroundImage: `url(${user.coverImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+    : { background: user.coverColor }
 
   return (
     <div className="profile-banner">
-      <div
-        className="profile-banner-cover"
-        style={{ background: user.coverColor }}
-        aria-hidden="true"
+      {/* ── Cover ── */}
+      <div className="profile-banner-cover" style={coverStyle}>
+        <button
+          className="cover-edit-btn"
+          onClick={() => coverInputRef.current?.click()}
+          aria-label="Change cover photo"
+        >
+          <IconCamera />
+          Change cover
+        </button>
+      </div>
+      <input
+        ref={coverInputRef}
+        type="file"
+        accept="image/*"
+        className="sr-only"
+        onChange={e => { const f = e.target.files?.[0]; if (f) readFile(f, setCoverImage) }}
+        tabIndex={-1}
       />
 
-      {/* Avatar: absolutely positioned, straddles cover/white boundary */}
+      {/* ── Avatar ── */}
       <button
         className="profile-avatar-btn"
-        onClick={() => inputRef.current?.click()}
+        onClick={() => avatarInputRef.current?.click()}
         aria-label="Change avatar photo"
       >
         <div className="profile-avatar">
@@ -48,15 +65,15 @@ export default function ProfileBanner() {
         </div>
       </button>
       <input
-        ref={inputRef}
+        ref={avatarInputRef}
         type="file"
         accept="image/*"
         className="sr-only"
-        onChange={handleFile}
+        onChange={e => { const f = e.target.files?.[0]; if (f) readFile(f, setAvatar) }}
         tabIndex={-1}
       />
 
-      {/* Info: in-flow, starts after cover → always in the white area */}
+      {/* ── Name / email ── */}
       <div className="profile-info-bar">
         <span className="profile-name">
           {[user.firstName, user.lastName].filter(Boolean).join(' ')}

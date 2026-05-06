@@ -11,6 +11,42 @@
   height: 100px;
   width: 100%;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 10px 12px;
+}
+
+.cover-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.40);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 500;
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity var(--transition-fast), background var(--transition-fast);
+  pointer-events: none;
+}
+
+.cover-edit-btn svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.profile-banner-cover:hover .cover-edit-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cover-edit-btn:hover {
+  background: rgba(0, 0, 0, 0.60);
 }
 
 /* Avatar button: absolutely positioned so it straddles the cover/white line */
