@@ -4,32 +4,28 @@ import AddTaskModal from '../kanban/AddTaskModal'
 import KanbanCard from '../kanban/KanbanCard'
 import './TodayPanel.css'
 
-function isSameDay(ts: number): boolean {
-  const d = new Date(ts), now = new Date()
-  return d.getFullYear() === now.getFullYear()
-      && d.getMonth()    === now.getMonth()
-      && d.getDate()     === now.getDate()
-}
-
 export default function TodayPanel() {
   const { filteredTodos, query, addTodo, updateStatus, deleteTodo, pinTodo } = useTodosContext()
   const [modalOpen, setModalOpen] = useState(false)
 
-  const todayTodos = filteredTodos.filter(t => isSameDay(t.createdAt))
+  const remainingTodos = filteredTodos
+    .filter(t => t.status !== 'done')
+    .sort((a, b) => (a.startDay ?? a.createdAt) - (b.startDay ?? b.createdAt))
+
   const today = new Date().toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric' })
 
   return (
     <aside className="today-panel">
       <div className="today-panel-header">
-        <span className="today-panel-title">Today</span>
+        <span className="today-panel-title">Task Remaining</span>
         <span className="today-panel-date">{today}</span>
       </div>
 
       <ul className="today-list">
-        {todayTodos.length === 0 && (
-          <li className="today-empty">No tasks added today yet.</li>
+        {remainingTodos.length === 0 && (
+          <li className="today-empty">No remaining tasks.</li>
         )}
-        {todayTodos.map(todo => (
+        {remainingTodos.map(todo => (
           <li key={todo.id}>
             <KanbanCard
               todo={todo}
