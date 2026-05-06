@@ -3,6 +3,7 @@ import { useTodosContext } from '../app/TodosContext'
 import TimelineHeader from '../components/timeline/TimelineHeader'
 import TimelineRow    from '../components/timeline/TimelineRow'
 import TaskDetailModal from '../components/kanban/TaskDetailModal'
+import DayView        from '../components/timeline/DayView'
 import type { Todo } from '../features/todos/model/todoLogic'
 import './TimelinePage.css'
 
@@ -26,13 +27,25 @@ function getWeekDays(anchor: Date): Date[] {
 }
 
 export default function TimelinePage() {
-  const { filteredTodos, updateStatus, deleteTodo, pinTodo } = useTodosContext()
+  const {
+    filteredTodos,
+    updateStatus,
+    deleteTodo,
+    pinTodo,
+    addSubTask,
+    updateSubTaskStatus,
+    deleteSubTask,
+  } = useTodosContext()
+
   const [viewMode, setViewMode] = useState<TLViewMode>('month')
   const [anchor,   setAnchor]   = useState(() => {
     const d = new Date()
     return new Date(d.getFullYear(), d.getMonth(), 1)
   })
-  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null)
+  const [selectedTodo,  setSelectedTodo]  = useState<Todo | null>(null)
+  const [selectedDayMs, setSelectedDayMs] = useState<number>(
+    () => new Date().setHours(0, 0, 0, 0)
+  )
 
   const visibleDays = viewMode === 'month'
     ? getDaysInMonth(anchor.getFullYear(), anchor.getMonth())
@@ -90,20 +103,36 @@ export default function TimelinePage() {
         onPrev={goPrev}
         onNext={goNext}
         onToday={goToday}
+        onDayClick={setSelectedDayMs}
+        selectedDayMs={selectedDayMs}
       />
 
-      <div className="timeline-body">
-        {filteredTodos.length === 0 && (
-          <p className="timeline-empty">No tasks yet — add some from the Dashboard or Tasks page.</p>
-        )}
-        {filteredTodos.map(todo => (
-          <TimelineRow
-            key={todo.id}
-            todo={todo}
-            visibleDays={visibleDays}
-            onOpenDetail={setSelectedTodo}
-          />
-        ))}
+      <div className="timeline-split">
+        {/* Left: day view */}
+        <DayView
+          selectedDayMs={selectedDayMs}
+          todos={filteredTodos}
+          onAddSubTask={(parentId, title, date) => addSubTask(parentId, title, { date })}
+          onUpdateSubTaskStatus={updateSubTaskStatus}
+          onDeleteSubTask={deleteSubTask}
+        />
+
+        {/* Right: Gantt */}
+        <div className="timeline-gantt">
+          {filteredTodos.length === 0 && (
+            <p className="timeline-empty">No tasks yet — add some from the Dashboard or Tasks page.</p>
+          )}
+          {filteredTodos.map(todo => (
+            <TimelineRow
+              key={todo.id}
+              todo={todo}
+              visibleDays={visibleDays}
+              onOpenDetail={setSelectedTodo}
+              onDayClick={setSelectedDayMs}
+              selectedDayMs={selectedDayMs}
+            />
+          ))}
+        </div>
       </div>
 
       {selectedTodo && (
