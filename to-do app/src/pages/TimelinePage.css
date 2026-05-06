@@ -1,25 +1,99 @@
 .timeline-page {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
-/* ── Two-column layout ── */
+/* ── Controls bar ── */
+.tl-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tl-controls-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tl-range-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  padding: 0 6px;
+}
+
+.tl-nav-btn {
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.tl-nav-btn:hover {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border-color: var(--accent-light);
+}
+
+.tl-nav-btn.icon {
+  padding: 6px 9px;
+  display: flex;
+  align-items: center;
+}
+
+.tl-nav-btn.icon svg { width: 15px; height: 15px; }
+
+.tl-view-toggle {
+  display: flex;
+  gap: 2px;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 3px;
+}
+
+.tl-view-btn {
+  padding: 5px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.tl-view-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ── Two-column split ── */
 .timeline-split {
   display: flex;
-  gap: 16px;
+  gap: 14px;
   align-items: flex-start;
 }
 
+/* ── Gantt card ── */
 .timeline-gantt {
   flex: 1;
-  min-width: 0;   /* prevent flex blowout */
+  min-width: 0;
   background: var(--bg-card);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--card-shadow);
   overflow: hidden;
   transition: background var(--transition-normal);
+}
+
+.tl-rows {
+  overflow-x: auto;
 }
 
 .timeline-empty {
@@ -29,9 +103,7 @@
   font-size: 0.875rem;
 }
 
-/* ── Responsive: stack on narrow screens ── */
+/* ── Responsive ── */
 @media (max-width: 960px) {
-  .timeline-split {
-    flex-direction: column;
-  }
+  .timeline-split { flex-direction: column; }
 }

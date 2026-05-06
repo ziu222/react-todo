@@ -3,14 +3,15 @@ import { calcProgress, toMidnight } from '../../features/todos/model/todoLogic'
 import './TimelineRow.css'
 
 interface TimelineRowProps {
-  todo:          Todo
-  visibleDays:   Date[]
-  onOpenDetail:  (todo: Todo) => void
-  onDayClick:    (dayMs: number) => void
+  todo:           Todo
+  visibleDays:    Date[]
+  onOpenDetail:   (todo: Todo) => void
+  onDayClick:     (dayMs: number) => void
   selectedDayMs?: number
+  todayIdx:       number
 }
 
-export default function TimelineRow({ todo, visibleDays, onOpenDetail, onDayClick, selectedDayMs }: TimelineRowProps) {
+export default function TimelineRow({ todo, visibleDays, onOpenDetail, onDayClick, selectedDayMs, todayIdx }: TimelineRowProps) {
   const n        = visibleDays.length
   const firstMs  = toMidnight(visibleDays[0])
   const lastMs   = toMidnight(visibleDays[n - 1])
@@ -19,8 +20,7 @@ export default function TimelineRow({ todo, visibleDays, onOpenDetail, onDayClic
   const endMs   = todo.endDay   != null ? toMidnight(todo.endDay)   : startMs
 
   const pillVisible = startMs <= lastMs && endMs >= firstMs
-
-  const progress = calcProgress(todo)
+  const progress    = calcProgress(todo)
 
   const clampedStart = Math.max(startMs, firstMs)
   const clampedEnd   = Math.min(endMs,   lastMs)
@@ -35,53 +35,55 @@ export default function TimelineRow({ todo, visibleDays, onOpenDetail, onDayClic
 
   return (
     <div className="tl-row">
-      <div className="tl-row-label">
-        <span className="tl-row-title">{todo.title}</span>
-        <span className="tl-row-status">{todo.status === 'in-progress' ? 'In Progress' : todo.status === 'todo' ? 'To Do' : todo.status.charAt(0).toUpperCase() + todo.status.slice(1)}</span>
-      </div>
+      {/* today column tint */}
+      {todayIdx >= 0 && (
+        <div
+          className="tl-row-today-bg"
+          style={{ left: `${(todayIdx / n) * 100}%`, width: `${(1 / n) * 100}%` }}
+        />
+      )}
 
-      <div className="tl-row-track">
-        {visibleDays.map(d => {
-          const dayMs = toMidnight(d)
-          return (
-            <div
-              key={d.toISOString()}
-              className={`tl-row-cell${dayMs === selectedDayMs ? ' selected' : ''}`}
-              onClick={() => onDayClick(dayMs)}
-              role="button"
-              tabIndex={-1}
-              aria-label={`Select ${d.toLocaleDateString()}`}
-            />
-          )
-        })}
-
-        {pillVisible && (
+      {/* day cells (for click interaction) */}
+      {visibleDays.map((d, i) => {
+        const dayMs = toMidnight(d)
+        return (
           <div
-            className="tl-pill"
-            style={{
-              left: `${leftPct}%`,
-              width: `${widthPct}%`,
-              '--pill-color': color,
-            } as React.CSSProperties}
-            onClick={e => { e.stopPropagation(); onOpenDetail(todo) }}
+            key={d.toISOString()}
+            className={`tl-row-cell${dayMs === selectedDayMs ? ' selected' : ''}${i === todayIdx ? ' today' : ''}`}
+            onClick={() => onDayClick(dayMs)}
             role="button"
-            tabIndex={0}
-            onKeyDown={e => e.key === 'Enter' && onOpenDetail(todo)}
-            title={`${todo.title} · ${progress}%`}
-          >
-            <div className="tl-pill-bg" />
-            <div className="tl-pill-fill" style={{ width: `${progress}%` }} />
-            <div className="tl-pill-content">
-              <span className="tl-pill-dot" />
-              <span className="tl-pill-name">{todo.title}</span>
-              <div className="tl-pill-meta">
-                <span className="tl-pill-pct">{progress}%</span>
-                <span className="tl-pill-arrow">›</span>
-              </div>
+            tabIndex={-1}
+          />
+        )
+      })}
+
+      {/* pill */}
+      {pillVisible && (
+        <div
+          className="tl-pill"
+          style={{
+            left: `${leftPct}%`,
+            width: `${widthPct}%`,
+            '--pill-color': color,
+          } as React.CSSProperties}
+          onClick={e => { e.stopPropagation(); onOpenDetail(todo) }}
+          role="button"
+          tabIndex={0}
+          onKeyDown={e => e.key === 'Enter' && onOpenDetail(todo)}
+          title={`${todo.title} · ${progress}%`}
+        >
+          <div className="tl-pill-bg" />
+          <div className="tl-pill-fill" style={{ width: `${progress}%` }} />
+          <div className="tl-pill-content">
+            <span className="tl-pill-dot" />
+            <span className="tl-pill-name">{todo.title}</span>
+            <div className="tl-pill-meta">
+              <span className="tl-pill-pct">{progress}%</span>
+              <span className="tl-pill-arrow">›</span>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }

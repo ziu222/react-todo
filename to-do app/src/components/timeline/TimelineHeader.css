@@ -1,124 +1,61 @@
-.tl-header {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background: var(--bg-card);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-lg);
-  padding: 14px 20px 0;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  transition: background var(--transition-normal);
-}
-
-.tl-header-nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-bottom: 2px;
-}
-
-.tl-range-label {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  min-width: 160px;
-  text-align: center;
-}
-
-/* ── View toggle ── */
-.tl-view-toggle {
-  display: flex;
-  gap: 2px;
-  background: var(--input-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 3px;
-  margin-left: auto;
-}
-
-.tl-view-btn {
-  padding: 4px 14px;
-  border-radius: var(--radius-sm);
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  transition: background var(--transition-fast), color var(--transition-fast);
-}
-
-.tl-view-btn.active {
-  background: var(--accent);
-  color: #fff;
-}
-
-.tl-nav-btn {
-  padding: 5px 12px;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  border: 1px solid var(--border-color);
-  transition: background var(--transition-fast), color var(--transition-fast);
-}
-
-.tl-nav-btn:hover {
-  background: var(--accent-subtle);
-  color: var(--accent);
-  border-color: var(--accent-light);
-}
-
-.tl-nav-btn.icon {
-  padding: 5px 8px;
-  display: flex;
-  align-items: center;
-}
-
-.tl-nav-btn.icon svg { width: 16px; height: 16px; }
-
-/* ── Date row: spacer + strip side-by-side ── */
-.tl-date-row {
-  display: flex;
-  align-items: stretch;
-  border-top: 1px solid var(--border-color);
-}
-
-.tl-label-spacer {
-  width: 200px;
-  flex-shrink: 0;
-  border-right: 1px solid var(--border-color);
-}
-
+/* ── Date strip — full-width of the Gantt panel ── */
 .tl-date-strip {
-  flex: 1;
   display: grid;
   grid-template-columns: repeat(var(--day-count, 30), 1fr);
-  overflow-x: auto;
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  background: var(--bg-card);
 }
 
-/* ── Date cells ── */
+/* subtle today column indicator behind the cells */
+.tl-today-col {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--accent-subtle);
+  pointer-events: none;
+  z-index: 0;
+}
+
 .tl-date-cell {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2px;
-  padding: 6px 2px;
+  padding: 8px 2px;
   border-left: 1px solid var(--border-color);
   min-width: 28px;
-  transition: background 0.15s;
+  cursor: pointer;
+  transition: background 0.12s;
+  user-select: none;
 }
 
-.tl-date-cell:first-child {
-  border-left: none;
-}
+.tl-date-cell:first-child { border-left: none; }
 
 .tl-date-cell.weekend {
-  background: rgba(0, 0, 0, 0.025);
+  background: rgba(0, 0, 0, 0.018);
 }
 
-.tl-date-cell.today {
+.tl-date-cell:hover:not(.today):not(.selected) {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.tl-date-cell.selected {
   background: var(--accent-subtle);
+}
+
+.tl-date-cell.selected .tl-date-num {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tl-date-cell.today .tl-date-num {
@@ -132,42 +69,33 @@
   justify-content: center;
 }
 
+.tl-date-cell.selected:not(.today) .tl-date-num {
+  background: transparent;
+  color: var(--accent);
+  outline: 2px solid var(--accent);
+}
+
 .tl-date-dow {
-  font-size: 0.68rem;
-  color: var(--text-muted);
+  font-size: 0.65rem;
   font-weight: 700;
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   line-height: 1;
 }
 
 .tl-date-cell.weekend .tl-date-dow {
   color: var(--accent);
-  opacity: 0.7;
+  opacity: 0.65;
+}
+
+.tl-date-cell.today .tl-date-dow {
+  color: var(--accent);
 }
 
 .tl-date-num {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-secondary);
   line-height: 1;
-}
-
-.tl-date-cell.selected {
-  background: var(--accent-subtle);
-}
-
-.tl-date-cell.selected .tl-date-num {
-  outline: 2px solid var(--accent);
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.tl-date-cell:not(.today):not(.selected):hover {
-  background: rgba(0, 0, 0, 0.03);
-  cursor: pointer;
 }

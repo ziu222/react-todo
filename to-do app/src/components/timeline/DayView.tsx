@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import type { Todo, TodoStatus, SubTask } from '../../features/todos/model/todoLogic'
-import { toMidnight, STATUS_LABEL } from '../../features/todos/model/todoLogic'
+import { toMidnight, STATUS_LABEL, calcProgress } from '../../features/todos/model/todoLogic'
 import './DayView.css'
 
 interface DayViewProps {
@@ -11,31 +11,27 @@ interface DayViewProps {
   onDeleteSubTask:       (parentId: string, subId: string) => void
 }
 
-const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const DAY_NAMES  = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
-function formatDayHeader(ms: number): string {
+function formatDayHeader(ms: number) {
   const d = new Date(ms)
-  return `${DAY_NAMES[d.getDay()]}, ${MONTH_NAMES[d.getMonth()]} ${d.getDate()}`
+  return { day: DAY_NAMES[d.getDay()], date: `${MONTH_SHORT[d.getMonth()]} ${d.getDate()}` }
 }
 
-function ChevronDown() {
+function ChevronIcon({ open }: { open: boolean }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+      style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
+    >
       <path d="M6 9l6 6 6-6" />
     </svg>
   )
 }
 
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 12 12" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
-      <path d="M2 6l2.5 2.5L10 3" />
-    </svg>
-  )
-}
-
-// ── Internal DayTaskCard ────────────────────────────────────────────────────
+// ── DayTaskCard ─────────────────────────────────────────────────────────────
 
 interface DayTaskCardProps {
   todo:                  Todo
@@ -46,21 +42,25 @@ interface DayTaskCardProps {
 }
 
 function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus, onDeleteSubTask }: DayTaskCardProps) {
-  const [expanded, setExpanded]           = useState(false)
+  const [expanded,     setExpanded]     = useState(false)
   const [addingSubTask, setAddingSubTask] = useState(false)
-  const [newSubTitle, setNewSubTitle]     = useState('')
+  const [newSubTitle,  setNewSubTitle]  = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Sub-tasks that belong to this day (undated sub-tasks show on all active days)
   const daySubTasks: SubTask[] = (todo.subTasks ?? []).filter(s =>
     s.date === undefined || toMidnight(s.date) === selectedDayMs
   )
 
-  // Earliest sub-task time for the time range label
-  const firstTime = daySubTasks.find(s => s.startTime)
-  const timeLabel = firstTime
+  const doneCount  = daySubTasks.filter(s => s.status === 'done').length
+  const totalCount = daySubTasks.length
+  const progress   = calcProgress(todo)
+
+  const firstTime  = daySubTasks.find(s => s.startTime)
+  const timeLabel  = firstTime
     ? `${firstTime.startTime}${firstTime.endTime ? ` – ${firstTime.endTime}` : ''}`
     : 'All day'
+
+  const color = todo.color ?? '#8B5CF6'
 
   useEffect(() => {
     if (addingSubTask) inputRef.current?.focus()
@@ -80,35 +80,37 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
   }
 
   function toggleSubStatus(sub: SubTask) {
-    const next: TodoStatus = sub.status === 'done' ? 'todo' : 'done'
-    onUpdateSubTaskStatus(todo.id, sub.id, next)
+    onUpdateSubTaskStatus(todo.id, sub.id, sub.status === 'done' ? 'todo' : 'done')
   }
 
-  const color = todo.color ?? '#8B5CF6'
-
   return (
-    <div
-      className={`dv-card${todo.status === 'in-progress' ? ' in-progress' : ''}`}
-      style={{ '--card-accent': color } as React.CSSProperties}
-    >
-      {/* Header row: status badge + time range */}
-      <div className="dv-card-header">
-        <span
-          className="dv-status-badge"
-          style={{ background: `${color}18`, color }}
-        >
+    <div className="dv-card" style={{ '--card-color': color } as React.CSSProperties}>
+      {/* Color accent bar at top */}
+      <div className="dv-card-bar" />
+
+      {/* Header: status badge + time */}
+      <div className="dv-card-head">
+        <span className="dv-status-badge" style={{ background: `${color}18`, color }}>
           {STATUS_LABEL[todo.status]}
         </span>
-        <span className="dv-time-range">{timeLabel}</span>
+        <span className="dv-time-label">{timeLabel}</span>
       </div>
 
       {/* Title */}
       <p className="dv-card-title">{todo.title}</p>
 
-      {/* Description (2-line clamp) */}
+      {/* Description */}
       {todo.description && (
         <p className="dv-card-desc">{todo.description}</p>
       )}
+
+      {/* Progress bar */}
+      <div className="dv-progress-row">
+        <div className="dv-progress-track">
+          <div className="dv-progress-fill" style={{ width: `${progress}%`, background: color }} />
+        </div>
+        <span className="dv-progress-pct">{progress}%</span>
+      </div>
 
       {/* Sub-task toggle */}
       <button
@@ -116,8 +118,8 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
         onClick={() => setExpanded(e => !e)}
         aria-expanded={expanded}
       >
-        <span className={`dv-chevron${expanded ? ' open' : ''}`}><ChevronDown /></span>
-        {daySubTasks.length} sub-task{daySubTasks.length !== 1 ? 's' : ''}
+        <span className="dv-chevron"><ChevronIcon open={expanded} /></span>
+        {totalCount > 0 ? `${doneCount}/${totalCount} sub-tasks` : '0 sub-tasks'}
       </button>
 
       {/* Sub-task list */}
@@ -126,38 +128,36 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
           {daySubTasks.map(sub => (
             <li key={sub.id} className="dv-subtask-row">
               <button
-                className={`dv-subtask-check${sub.status === 'done' ? ' done' : ''}`}
+                className={`dv-check${sub.status === 'done' ? ' done' : ''}`}
+                style={{ '--check-color': color } as React.CSSProperties}
                 onClick={() => toggleSubStatus(sub)}
                 aria-label={sub.status === 'done' ? 'Mark incomplete' : 'Mark complete'}
               >
-                {sub.status === 'done' && <CheckIcon />}
+                {sub.status === 'done' && (
+                  <svg viewBox="0 0 10 10" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
+                    <path d="M2 5l2.5 2.5L8 3" />
+                  </svg>
+                )}
               </button>
-              <span className={`dv-subtask-title${sub.status === 'done' ? ' done' : ''}`}>
-                {sub.title}
-              </span>
+              <span className={`dv-sub-title${sub.status === 'done' ? ' done' : ''}`}>{sub.title}</span>
               {sub.startTime && (
-                <span className="dv-subtask-time">
-                  {sub.startTime}{sub.endTime ? ` – ${sub.endTime}` : ''}
-                </span>
+                <span className="dv-sub-time">{sub.startTime}{sub.endTime ? ` – ${sub.endTime}` : ''}</span>
               )}
               <button
-                className="dv-subtask-delete"
+                className="dv-sub-del"
                 onClick={() => onDeleteSubTask(todo.id, sub.id)}
-                aria-label="Delete sub-task"
-              >
-                ×
-              </button>
+                aria-label="Delete"
+              >×</button>
             </li>
           ))}
 
-          {/* Notion-style inline add */}
           {addingSubTask ? (
-            <li className="dv-subtask-add-row">
+            <li className="dv-add-row">
               <input
                 ref={inputRef}
-                className="dv-subtask-input"
+                className="dv-add-input"
                 type="text"
-                placeholder="Sub-task name… Enter to confirm, Esc to cancel"
+                placeholder="Sub-task name… Enter ✓  Esc ✕"
                 value={newSubTitle}
                 onChange={e => setNewSubTitle(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -166,10 +166,7 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
             </li>
           ) : (
             <li>
-              <button
-                className="dv-add-subtask-btn"
-                onClick={() => setAddingSubTask(true)}
-              >
+              <button className="dv-add-btn" onClick={() => setAddingSubTask(true)}>
                 + Add sub-task
               </button>
             </li>
@@ -180,7 +177,7 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
   )
 }
 
-// ── DayView panel ──────────────────────────────────────────────────────────
+// ── DayView panel ────────────────────────────────────────────────────────────
 
 export default function DayView({ selectedDayMs, todos, onAddSubTask, onUpdateSubTaskStatus, onDeleteSubTask }: DayViewProps) {
   const activeTasks = todos.filter(t => {
@@ -189,16 +186,26 @@ export default function DayView({ selectedDayMs, todos, onAddSubTask, onUpdateSu
     return start <= selectedDayMs && selectedDayMs <= end
   })
 
+  const { day, date } = formatDayHeader(selectedDayMs)
+  const isToday = selectedDayMs === new Date().setHours(0,0,0,0)
+
   return (
     <aside className="dv-panel">
       <header className="dv-header">
-        <span className="dv-date-label">{formatDayHeader(selectedDayMs)}</span>
-        <span className="dv-task-count">{activeTasks.length} task{activeTasks.length !== 1 ? 's' : ''}</span>
+        <div className="dv-header-day">{day}</div>
+        <div className="dv-header-date">
+          {date}
+          {isToday && <span className="dv-today-chip">Today</span>}
+        </div>
+        <div className="dv-header-count">{activeTasks.length} task{activeTasks.length !== 1 ? 's' : ''}</div>
       </header>
 
       <div className="dv-scroll">
         {activeTasks.length === 0 ? (
-          <p className="dv-empty">No tasks on this day.</p>
+          <div className="dv-empty">
+            <span className="dv-empty-icon">📅</span>
+            <p>No tasks on this day</p>
+          </div>
         ) : (
           activeTasks.map(todo => (
             <DayTaskCard
