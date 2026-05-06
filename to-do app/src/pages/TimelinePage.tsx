@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useTodosContext } from '../app/TodosContext'
 import TimelineHeader from '../components/timeline/TimelineHeader'
 import TimelineRow    from '../components/timeline/TimelineRow'
+import TaskDetailModal from '../components/kanban/TaskDetailModal'
+import type { Todo } from '../features/todos/model/todoLogic'
 import './TimelinePage.css'
 
 export type TLViewMode = 'month' | 'week'
@@ -12,7 +14,7 @@ function getDaysInMonth(year: number, month: number): Date[] {
 }
 
 function getWeekDays(anchor: Date): Date[] {
-  const day = anchor.getDay()                     // 0=Sun … 6=Sat
+  const day = anchor.getDay()
   const monday = new Date(anchor)
   monday.setDate(anchor.getDate() + (day === 0 ? -6 : 1 - day))
   monday.setHours(0, 0, 0, 0)
@@ -24,12 +26,13 @@ function getWeekDays(anchor: Date): Date[] {
 }
 
 export default function TimelinePage() {
-  const { filteredTodos } = useTodosContext()
+  const { filteredTodos, updateStatus, deleteTodo, pinTodo } = useTodosContext()
   const [viewMode, setViewMode] = useState<TLViewMode>('month')
   const [anchor,   setAnchor]   = useState(() => {
     const d = new Date()
     return new Date(d.getFullYear(), d.getMonth(), 1)
   })
+  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null)
 
   const visibleDays = viewMode === 'month'
     ? getDaysInMonth(anchor.getFullYear(), anchor.getMonth())
@@ -66,7 +69,6 @@ export default function TimelinePage() {
 
   function handleViewChange(mode: TLViewMode) {
     setViewMode(mode)
-    // re-anchor: keep current context but adjust anchor type
     const today = new Date()
     if (mode === 'month') {
       setAnchor(new Date(today.getFullYear(), today.getMonth(), 1))
@@ -95,9 +97,24 @@ export default function TimelinePage() {
           <p className="timeline-empty">No tasks yet — add some from the Dashboard or Tasks page.</p>
         )}
         {filteredTodos.map(todo => (
-          <TimelineRow key={todo.id} todo={todo} visibleDays={visibleDays} />
+          <TimelineRow
+            key={todo.id}
+            todo={todo}
+            visibleDays={visibleDays}
+            onOpenDetail={setSelectedTodo}
+          />
         ))}
       </div>
+
+      {selectedTodo && (
+        <TaskDetailModal
+          todo={selectedTodo}
+          onClose={() => setSelectedTodo(null)}
+          onUpdateStatus={updateStatus}
+          onDelete={deleteTodo}
+          onPin={pinTodo}
+        />
+      )}
     </div>
   )
 }
