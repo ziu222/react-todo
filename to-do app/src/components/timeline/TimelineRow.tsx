@@ -1,26 +1,16 @@
 import type { Todo } from '../../features/todos/model/todoLogic'
-import { calcProgress } from '../../features/todos/model/todoLogic'
+import { calcProgress, toMidnight } from '../../features/todos/model/todoLogic'
 import './TimelineRow.css'
 
 interface TimelineRowProps {
   todo:          Todo
   visibleDays:   Date[]
   onOpenDetail:  (todo: Todo) => void
+  onDayClick:    (dayMs: number) => void
+  selectedDayMs?: number
 }
 
-const STATUS_LABEL: Record<string, string> = {
-  backlog:       'Backlog',
-  todo:          'To Do',
-  'in-progress': 'In Progress',
-  done:          'Done',
-}
-
-function toMidnight(d: Date | number): number {
-  const dt = typeof d === 'number' ? new Date(d) : d
-  return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()).getTime()
-}
-
-export default function TimelineRow({ todo, visibleDays, onOpenDetail }: TimelineRowProps) {
+export default function TimelineRow({ todo, visibleDays, onOpenDetail, onDayClick, selectedDayMs }: TimelineRowProps) {
   const n        = visibleDays.length
   const firstMs  = toMidnight(visibleDays[0])
   const lastMs   = toMidnight(visibleDays[n - 1])
@@ -49,13 +39,23 @@ export default function TimelineRow({ todo, visibleDays, onOpenDetail }: Timelin
     <div className="tl-row">
       <div className="tl-row-label">
         <span className="tl-row-title">{todo.title}</span>
-        <span className="tl-row-status">{STATUS_LABEL[todo.status]}</span>
+        <span className="tl-row-status">{todo.status === 'in-progress' ? 'In Progress' : todo.status === 'todo' ? 'To Do' : todo.status.charAt(0).toUpperCase() + todo.status.slice(1)}</span>
       </div>
 
       <div className="tl-row-track">
-        {visibleDays.map(d => (
-          <div key={d.toISOString()} className="tl-row-cell" />
-        ))}
+        {visibleDays.map(d => {
+          const dayMs = toMidnight(d)
+          return (
+            <div
+              key={d.toISOString()}
+              className={`tl-row-cell${dayMs === selectedDayMs ? ' selected' : ''}`}
+              onClick={() => onDayClick(dayMs)}
+              role="button"
+              tabIndex={-1}
+              aria-label={`Select ${d.toLocaleDateString()}`}
+            />
+          )
+        })}
 
         {pillVisible && (
           <div
@@ -65,17 +65,14 @@ export default function TimelineRow({ todo, visibleDays, onOpenDetail }: Timelin
               width: `${widthPct}%`,
               '--pill-color': color,
             } as React.CSSProperties}
-            onClick={() => onOpenDetail(todo)}
+            onClick={e => { e.stopPropagation(); onOpenDetail(todo) }}
             role="button"
             tabIndex={0}
             onKeyDown={e => e.key === 'Enter' && onOpenDetail(todo)}
             title={`${todo.title} · ${progress}%`}
           >
-            {/* faint full-width track */}
             <div className="tl-pill-bg" />
-            {/* solid progress fill */}
             <div className="tl-pill-fill" style={{ width: `${progress}%` }} />
-            {/* content layer */}
             <div className="tl-pill-content">
               <span className="tl-pill-dot" />
               <span className="tl-pill-name">{todo.title}</span>
