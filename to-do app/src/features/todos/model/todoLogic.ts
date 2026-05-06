@@ -16,6 +16,7 @@ export interface SubTask {
   endTime?:     string    // "HH:MM" local-time display string
   description?: string
   date?:        number    // unix ms midnight — which day this sub-task belongs to
+  category?:    string
 }
 
 export interface Todo {
@@ -47,12 +48,31 @@ export function toMidnight(d: Date | number): number {
   return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()).getTime()
 }
 
-// Option B: done=100 always first, then sub-task completion%, then date-based capped at 99
+function parseHHMM(t: string): number {
+  const [h, m] = t.split(':').map(Number)
+  return h * 60 + (m ?? 0)
+}
+
+function calcSubTaskProgress(sub: SubTask): number {
+  if (sub.status === 'done') return 100
+  if (sub.startTime && sub.endTime) {
+    const now  = new Date()
+    const nowM = now.getHours() * 60 + now.getMinutes()
+    const s    = parseHHMM(sub.startTime)
+    const e    = parseHHMM(sub.endTime)
+    if (nowM <= s) return 0
+    if (nowM >= e) return 99
+    return Math.round(((nowM - s) / (e - s)) * 100)
+  }
+  return 0
+}
+
+// done=100 always; sub-task time-weighted average capped at 99; date-based capped at 99
 export function calcProgress(todo: Todo): number {
   if (todo.status === 'done') return 100
   if (todo.subTasks && todo.subTasks.length > 0) {
-    const done = todo.subTasks.filter(s => s.status === 'done').length
-    return Math.round((done / todo.subTasks.length) * 100)
+    const total = todo.subTasks.reduce((sum, s) => sum + calcSubTaskProgress(s), 0)
+    return Math.min(99, Math.round(total / todo.subTasks.length))
   }
   if (todo.startDay == null || todo.endDay == null) return 0
   const todayMs = new Date().setHours(0, 0, 0, 0)
@@ -93,7 +113,7 @@ export type TodoAction =
   | { type: 'SET_FILTER';    payload: { filter: Filter } }
   | { type: 'SET_SEARCH';    payload: { query: string } }
   | { type: 'HYDRATE';       payload: { todos: Todo[] } }
-  | { type: 'ADD_SUBTASK';           payload: { parentId: string; title: string; date?: number; startTime?: string; endTime?: string; description?: string } }
+  | { type: 'ADD_SUBTASK';           payload: { parentId: string; title: string; date?: number; startTime?: string; endTime?: string; description?: string; category?: string } }
   | { type: 'UPDATE_SUBTASK_STATUS'; payload: { parentId: string; subId: string; status: TodoStatus } }
   | { type: 'DELETE_SUBTASK';        payload: { parentId: string; subId: string } }
   | { type: 'SYNC_STATUS';           payload: { todayMs: number } }
@@ -163,7 +183,7 @@ export function addSubTask(
   todos: Todo[],
   parentId: string,
   title: string,
-  extras?: Pick<Partial<SubTask>, 'date' | 'startTime' | 'endTime' | 'description'>,
+  extras?: Pick<Partial<SubTask>, 'date' | 'startTime' | 'endTime' | 'description' | 'category'>,
 ): Todo[] {
   const trimmed = title.trim()
   if (!trimmed || trimmed.length > 500) return todos
