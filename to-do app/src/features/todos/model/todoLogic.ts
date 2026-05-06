@@ -96,6 +96,7 @@ export type TodoAction =
   | { type: 'ADD_SUBTASK';           payload: { parentId: string; title: string; date?: number; startTime?: string; endTime?: string; description?: string } }
   | { type: 'UPDATE_SUBTASK_STATUS'; payload: { parentId: string; subId: string; status: TodoStatus } }
   | { type: 'DELETE_SUBTASK';        payload: { parentId: string; subId: string } }
+  | { type: 'SYNC_STATUS';           payload: { todayMs: number } }
 
 export const INITIAL_STATE: TodoState = { todos: [], filter: 'all', query: '' }
 
@@ -231,6 +232,17 @@ export function todosReducer(state: TodoState, action: TodoAction): TodoState {
       return { ...state, todos: updateSubTaskStatus(state.todos, action.payload.parentId, action.payload.subId, action.payload.status) }
     case 'DELETE_SUBTASK':
       return { ...state, todos: deleteSubTask(state.todos, action.payload.parentId, action.payload.subId) }
+    case 'SYNC_STATUS': {
+      const { todayMs } = action.payload
+      return {
+        ...state,
+        todos: state.todos.map(t => {
+          if (t.status !== 'todo') return t
+          const startMs = t.startDay != null ? toMidnight(t.startDay) : toMidnight(t.createdAt)
+          return startMs <= todayMs ? { ...t, status: 'in-progress' } : t
+        }),
+      }
+    }
   }
 }
 
