@@ -116,9 +116,14 @@ export function addTodo(
   if (!trimmed || trimmed.length > 500) return todos
 
   const todayMs = new Date().setHours(0, 0, 0, 0)
-  const autoStatus = extras?.endDay !== undefined && extras.endDay < todayMs
-    ? 'done'
-    : (extras?.status ?? 'todo')
+  let autoStatus: TodoStatus
+  if (extras?.endDay !== undefined && extras.endDay < todayMs) {
+    autoStatus = 'done'
+  } else if (extras?.startDay !== undefined && extras.startDay > todayMs) {
+    autoStatus = 'todo'
+  } else {
+    autoStatus = 'in-progress'
+  }
 
   return [
     ...todos,
