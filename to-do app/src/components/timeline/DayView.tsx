@@ -60,7 +60,8 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
     ? `${firstTime.startTime}${firstTime.endTime ? ` – ${firstTime.endTime}` : ''}`
     : 'All day'
 
-  const color = todo.color ?? '#8B5CF6'
+  const color  = todo.color ?? '#8B5CF6'
+  const isDone = todo.status === 'done'
 
   useEffect(() => {
     if (addingSubTask) inputRef.current?.focus()
@@ -84,7 +85,7 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
   }
 
   return (
-    <div className="dv-card" style={{ '--card-color': color } as React.CSSProperties}>
+    <div className={`dv-card${isDone ? ' done' : ''}`} style={{ '--card-color': color } as React.CSSProperties}>
       {/* Color accent bar at top */}
       <div className="dv-card-bar" />
 
@@ -151,25 +152,27 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
             </li>
           ))}
 
-          {addingSubTask ? (
-            <li className="dv-add-row">
-              <input
-                ref={inputRef}
-                className="dv-add-input"
-                type="text"
-                placeholder="Sub-task name… Enter ✓  Esc ✕"
-                value={newSubTitle}
-                onChange={e => setNewSubTitle(e.target.value)}
-                onKeyDown={handleKeyDown}
-                maxLength={500}
-              />
-            </li>
-          ) : (
-            <li>
-              <button className="dv-add-btn" onClick={() => setAddingSubTask(true)}>
-                + Add sub-task
-              </button>
-            </li>
+          {!isDone && (
+            addingSubTask ? (
+              <li className="dv-add-row">
+                <input
+                  ref={inputRef}
+                  className="dv-add-input"
+                  type="text"
+                  placeholder="Sub-task name… Enter ✓  Esc ✕"
+                  value={newSubTitle}
+                  onChange={e => setNewSubTitle(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  maxLength={500}
+                />
+              </li>
+            ) : (
+              <li>
+                <button className="dv-add-btn" onClick={() => setAddingSubTask(true)}>
+                  + Add sub-task
+                </button>
+              </li>
+            )
           )}
         </ul>
       )}

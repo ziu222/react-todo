@@ -97,6 +97,24 @@
   transform: translateY(-1px);
 }
 
+.dv-card.done {
+  opacity: 0.72;
+}
+
+.dv-card.done .dv-card-bar {
+  background: #10B981;
+}
+
+.dv-card.done .dv-card-title {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.dv-card.done .dv-status-badge {
+  background: #10B98118 !important;
+  color: #10B981 !important;
+}
+
 /* Colored top bar */
 .dv-card-bar {
   height: 3px;
