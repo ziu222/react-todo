@@ -118,8 +118,8 @@ export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onPi
   const [detailOpen, setDetailOpen] = useState(false)
   const nextStatus = STATUS_NEXT[todo.status]
   const todayMs    = new Date().setHours(0, 0, 0, 0)
-  const progress   = todo.startDay != null && todo.endDay != null
-    ? calcProgress(todo.startDay, todo.endDay)
+  const progress   = (todo.startDay != null && todo.endDay != null) || (todo.subTasks && todo.subTasks.length > 0)
+    ? calcProgress(todo)
     : null
   const isOverdue  = todo.endDay != null && todo.endDay < todayMs && todo.status !== 'done'
 
