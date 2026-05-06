@@ -1,0 +1,21 @@
+.timeline-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.timeline-body {
+  background: var(--bg-card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: background var(--transition-normal);
+}
+
+.timeline-empty {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
