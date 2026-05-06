@@ -152,3 +152,22 @@
   color: var(--text-secondary);
   line-height: 1;
 }
+
+.tl-date-cell.selected {
+  background: var(--accent-subtle);
+}
+
+.tl-date-cell.selected .tl-date-num {
+  outline: 2px solid var(--accent);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tl-date-cell:not(.today):not(.selected):hover {
+  background: rgba(0, 0, 0, 0.03);
+  cursor: pointer;
+}

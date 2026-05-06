@@ -49,6 +49,9 @@
 
 .tl-row-cell:first-child { border-left: none; }
 
+.tl-row-cell.selected { background: var(--accent-subtle); }
+.tl-row-cell:hover:not(.selected) { background: rgba(0,0,0,0.025); cursor: pointer; }
+
 /* ── Pill ── */
 .tl-pill {
   position: absolute;
