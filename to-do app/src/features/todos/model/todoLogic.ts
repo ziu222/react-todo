@@ -47,14 +47,14 @@ export function toMidnight(d: Date | number): number {
   return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()).getTime()
 }
 
-// Option B: sub-task based when subTasks exist, date-based fallback capped at 99 until done
+// Option B: done=100 always first, then sub-task completion%, then date-based capped at 99
 export function calcProgress(todo: Todo): number {
+  if (todo.status === 'done') return 100
   if (todo.subTasks && todo.subTasks.length > 0) {
     const done = todo.subTasks.filter(s => s.status === 'done').length
     return Math.round((done / todo.subTasks.length) * 100)
   }
   if (todo.startDay == null || todo.endDay == null) return 0
-  if (todo.status === 'done') return 100
   const todayMs = new Date().setHours(0, 0, 0, 0)
   if (todayMs <= todo.startDay) return 0
   return Math.min(99, Math.round(
@@ -96,6 +96,7 @@ export type TodoAction =
   | { type: 'ADD_SUBTASK';           payload: { parentId: string; title: string; date?: number; startTime?: string; endTime?: string; description?: string } }
   | { type: 'UPDATE_SUBTASK_STATUS'; payload: { parentId: string; subId: string; status: TodoStatus } }
   | { type: 'DELETE_SUBTASK';        payload: { parentId: string; subId: string } }
+  | { type: 'SYNC_STATUS';           payload: { todayMs: number } }
 
 export const INITIAL_STATE: TodoState = { todos: [], filter: 'all', query: '' }
 
@@ -116,9 +117,14 @@ export function addTodo(
   if (!trimmed || trimmed.length > 500) return todos
 
   const todayMs = new Date().setHours(0, 0, 0, 0)
-  const autoStatus = extras?.endDay !== undefined && extras.endDay < todayMs
-    ? 'done'
-    : (extras?.status ?? 'todo')
+  let autoStatus: TodoStatus
+  if (extras?.endDay !== undefined && extras.endDay < todayMs) {
+    autoStatus = 'done'
+  } else if (extras?.startDay !== undefined && extras.startDay > todayMs) {
+    autoStatus = 'todo'
+  } else {
+    autoStatus = 'in-progress'
+  }
 
   return [
     ...todos,
@@ -226,6 +232,17 @@ export function todosReducer(state: TodoState, action: TodoAction): TodoState {
       return { ...state, todos: updateSubTaskStatus(state.todos, action.payload.parentId, action.payload.subId, action.payload.status) }
     case 'DELETE_SUBTASK':
       return { ...state, todos: deleteSubTask(state.todos, action.payload.parentId, action.payload.subId) }
+    case 'SYNC_STATUS': {
+      const { todayMs } = action.payload
+      return {
+        ...state,
+        todos: state.todos.map(t => {
+          if (t.status !== 'todo') return t
+          const startMs = t.startDay != null ? toMidnight(t.startDay) : toMidnight(t.createdAt)
+          return startMs <= todayMs ? { ...t, status: 'in-progress' } : t
+        }),
+      }
+    }
   }
 }
 

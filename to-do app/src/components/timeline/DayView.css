@@ -1,6 +1,6 @@
 /* ── Panel shell ── */
 .dv-panel {
-  width: 300px;
+  width: 290px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -10,31 +10,57 @@
   box-shadow: var(--card-shadow);
   overflow: hidden;
   transition: background var(--transition-normal);
-  max-height: calc(100vh - 200px);
+  max-height: calc(100vh - 180px);
+  position: sticky;
+  top: 16px;
 }
 
+/* ── Header ── */
 .dv-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 14px 16px 12px;
+  padding: 16px 16px 12px;
+  background: var(--accent-subtle);
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
 }
 
-.dv-date-label {
-  font-size: 0.875rem;
+.dv-header-day {
+  font-size: 0.7rem;
   font-weight: 700;
-  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 2px;
 }
 
-.dv-task-count {
+.dv-header-date {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.2;
+}
+
+.dv-today-chip {
+  font-size: 0.62rem;
+  font-weight: 700;
+  background: var(--accent);
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dv-header-count {
   font-size: 0.72rem;
   color: var(--text-muted);
-  flex-shrink: 0;
+  margin-top: 4px;
+  font-weight: 500;
 }
 
+/* ── Scroll area ── */
 .dv-scroll {
   flex: 1;
   overflow-y: auto;
@@ -44,125 +70,175 @@
   gap: 8px;
 }
 
+/* ── Empty state ── */
 .dv-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 36px 0;
   color: var(--text-muted);
-  font-size: 0.82rem;
-  text-align: center;
-  padding: 32px 0;
 }
+
+.dv-empty-icon { font-size: 1.6rem; }
+.dv-empty p    { font-size: 0.82rem; }
 
 /* ── Task card ── */
 .dv-card {
   background: var(--bg-card);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-md);
-  border-left: 3px solid var(--card-accent, var(--border-color));
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  transition: box-shadow var(--transition-fast);
+  overflow: hidden;
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 
 .dv-card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
 }
 
-.dv-card-header {
+.dv-card.done {
+  opacity: 0.72;
+}
+
+.dv-card.done .dv-card-bar {
+  background: #10B981;
+}
+
+.dv-card.done .dv-card-title {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.dv-card.done .dv-status-badge {
+  background: #10B98118 !important;
+  color: #10B981 !important;
+}
+
+/* Colored top bar */
+.dv-card-bar {
+  height: 3px;
+  background: var(--card-color);
+}
+
+.dv-card-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 10px 12px 0;
   gap: 8px;
 }
 
 .dv-status-badge {
-  display: inline-flex;
-  align-items: center;
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
   padding: 2px 8px;
   border-radius: 20px;
-  font-size: 0.62rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   white-space: nowrap;
 }
 
-.dv-time-range {
-  font-size: 0.7rem;
+.dv-time-label {
+  font-size: 0.68rem;
   color: var(--text-muted);
   font-weight: 500;
   flex-shrink: 0;
 }
 
 .dv-card-title {
-  font-size: 0.855rem;
+  font-size: 0.87rem;
   font-weight: 700;
   color: var(--text-primary);
+  padding: 6px 12px 0;
   line-height: 1.35;
 }
 
 .dv-card-desc {
-  font-size: 0.76rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
+  padding: 4px 12px 0;
   line-height: 1.5;
-  overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* ── Sub-task toggle button ── */
+/* ── Progress bar ── */
+.dv-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 2px;
+}
+
+.dv-progress-track {
+  flex: 1;
+  height: 4px;
+  background: var(--border-color);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.dv-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.dv-progress-pct {
+  font-size: 0.67rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  min-width: 28px;
+  text-align: right;
+}
+
+/* ── Sub-task toggle ── */
 .dv-subtask-toggle {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 0.73rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
-  margin-top: 2px;
-  padding: 2px 0;
+  padding: 6px 12px 8px;
+  width: 100%;
+  text-align: left;
   transition: color var(--transition-fast);
 }
 
 .dv-subtask-toggle:hover { color: var(--accent); }
 
-.dv-chevron {
-  display: flex;
-  align-items: center;
-}
-
 .dv-chevron svg {
-  width: 12px;
-  height: 12px;
-  transition: transform var(--transition-fast);
+  width: 13px;
+  height: 13px;
 }
-
-.dv-chevron.open svg { transform: rotate(180deg); }
 
 /* ── Sub-task list ── */
 .dv-subtask-list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-top: 4px;
-  padding-left: 6px;
-  border-left: 2px solid var(--border-color);
+  padding: 0 12px 10px 12px;
+  gap: 3px;
+  border-top: 1px solid var(--border-color);
 }
 
 .dv-subtask-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 2px;
-  border-radius: var(--radius-sm);
+  padding: 5px 0;
 }
 
-.dv-subtask-row:hover .dv-subtask-delete { opacity: 1; }
+.dv-subtask-row:hover .dv-sub-del { opacity: 1; }
 
 /* Checkbox */
-.dv-subtask-check {
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
+.dv-check {
+  width: 17px;
+  height: 17px;
+  border-radius: 5px;
   border: 1.5px solid var(--border-color);
   flex-shrink: 0;
   background: transparent;
@@ -172,82 +248,84 @@
   transition: background var(--transition-fast), border-color var(--transition-fast);
 }
 
-.dv-subtask-check.done {
-  background: #10B981;
-  border-color: #10B981;
+.dv-check.done {
+  background: var(--check-color, var(--accent));
+  border-color: var(--check-color, var(--accent));
 }
 
-.dv-subtask-title {
+.dv-check svg { width: 10px; height: 10px; }
+
+.dv-sub-title {
   flex: 1;
   font-size: 0.79rem;
   color: var(--text-primary);
-  transition: color var(--transition-fast);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.dv-subtask-title.done {
+.dv-sub-title.done {
   color: var(--text-muted);
   text-decoration: line-through;
 }
 
-.dv-subtask-time {
-  font-size: 0.68rem;
+.dv-sub-time {
+  font-size: 0.67rem;
   color: var(--text-muted);
   flex-shrink: 0;
 }
 
-.dv-subtask-delete {
-  color: var(--text-muted);
-  font-size: 1.1rem;
+.dv-sub-del {
   width: 20px;
   height: 20px;
+  font-size: 1rem;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-sm);
-  opacity: 0;
   flex-shrink: 0;
-  transition: opacity var(--transition-fast), color var(--transition-fast);
+  opacity: 0;
   line-height: 1;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
 }
 
-.dv-subtask-delete:hover { color: #EF4444; }
+.dv-sub-del:hover { color: #EF4444; }
 
 /* ── Inline add ── */
-.dv-add-subtask-btn {
-  font-size: 0.76rem;
+.dv-add-btn {
+  font-size: 0.75rem;
   color: var(--accent);
-  padding: 4px 2px;
-  opacity: 0.7;
+  opacity: 0.75;
+  padding: 4px 0;
   transition: opacity var(--transition-fast);
 }
 
-.dv-add-subtask-btn:hover { opacity: 1; }
+.dv-add-btn:hover { opacity: 1; }
 
-.dv-subtask-add-row { padding: 2px 0; }
+.dv-add-row { padding: 2px 0; }
 
-.dv-subtask-input {
+.dv-add-input {
   width: 100%;
   font-size: 0.79rem;
   color: var(--text-primary);
   background: var(--input-bg);
-  border: 1px solid var(--accent-light);
+  border: 1.5px solid var(--accent-light);
   border-radius: var(--radius-sm);
-  padding: 5px 8px;
+  padding: 5px 9px;
   outline: none;
 }
 
-.dv-subtask-input:focus {
+.dv-add-input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-subtle);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
 }
 
 /* ── Responsive ── */
 @media (max-width: 960px) {
   .dv-panel {
     width: 100%;
-    max-height: 320px;
+    max-height: 360px;
+    position: static;
   }
 }
