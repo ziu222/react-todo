@@ -1,7 +1,7 @@
 .tl-row {
   display: flex;
   align-items: center;
-  min-height: 56px;
+  min-height: 64px;
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -13,11 +13,12 @@
   padding: 10px 16px 10px 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
+  border-right: 1px solid var(--border-color);
 }
 
 .tl-row-title {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-primary);
   overflow: hidden;
@@ -26,8 +27,10 @@
 }
 
 .tl-row-status {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 .tl-row-track {
@@ -35,7 +38,7 @@
   position: relative;
   display: grid;
   grid-template-columns: repeat(var(--day-count, 30), 1fr);
-  height: 56px;
+  height: 64px;
   align-items: center;
 }
 
@@ -49,52 +52,112 @@
 /* ── Pill ── */
 .tl-pill {
   position: absolute;
-  height: 26px;
-  border-radius: 13px;
+  height: 36px;
+  border-radius: 18px;
   overflow: hidden;
   display: flex;
   align-items: center;
-  min-width: 26px;
+  min-width: 36px;
   cursor: pointer;
+  transition: filter 0.15s, transform 0.15s;
 }
 
-/* dim track */
+.tl-pill:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+/* faint full-width background */
 .tl-pill-bg {
   position: absolute;
   inset: 0;
+  background: var(--pill-color);
   opacity: 0.18;
   border-radius: inherit;
 }
 
-/* colored fill = progress */
+/* solid progress fill from the left */
 .tl-pill-fill {
   position: absolute;
   top: 0;
   left: 0;
   height: 100%;
-  opacity: 0.85;
+  background: var(--pill-color);
+  opacity: 0.88;
   border-radius: inherit;
   transition: width 0.4s ease;
+  min-width: 36px;
 }
 
-/* text on top */
-.tl-pill-label {
+/* content sits above both layers */
+.tl-pill-content {
   position: relative;
   z-index: 1;
-  padding: 0 10px;
-  font-size: 0.68rem;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 8px 0 10px;
+  gap: 6px;
+}
+
+.tl-pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.tl-pill-name {
+  flex: 1;
+  font-size: 0.78rem;
   font-weight: 700;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 100%;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
-  letter-spacing: 0.02em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.01em;
 }
 
-.tl-pill:hover .tl-pill-bg { opacity: 0.28; }
+/* right side: progress badge + arrow */
+.tl-pill-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.tl-pill-pct {
+  background: #fff;
+  color: #333;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  line-height: 1.5;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.tl-pill-arrow {
+  background: rgba(255, 255, 255, 0.9);
+  color: #555;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
 
 @media (max-width: 768px) {
   .tl-row-label { width: 120px; }
+  .tl-label-spacer { width: 120px; }
 }
