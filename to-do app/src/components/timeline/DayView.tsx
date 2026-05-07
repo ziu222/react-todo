@@ -93,9 +93,27 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
     setAddingSubTask(false)
   }
 
+  function isValidTime(t: string): boolean {
+    const [hStr, mStr] = t.split(':')
+    const h = parseInt(hStr, 10), m = parseInt(mStr, 10)
+    return h >= 0 && h <= 23 && m >= 0 && m <= 59
+  }
+
   function handleCreate() {
     const val = newSubTitle.trim()
     if (!val) return
+    if (newStartTime && !isValidTime(newStartTime)) {
+      setTimeError('Invalid start time — use HH:MM (00:00 – 23:59)')
+      return
+    }
+    if (newEndTime && !isValidTime(newEndTime)) {
+      setTimeError('Invalid end time — use HH:MM (00:00 – 23:59)')
+      return
+    }
+    if (newStartTime && newEndTime && parseHHMM(newEndTime) <= parseHHMM(newStartTime)) {
+      setTimeError('End time must be after start time')
+      return
+    }
     const todayMs = new Date().setHours(0, 0, 0, 0)
     if (selectedDayMs === todayMs && newStartTime && newEndTime) {
       const now  = new Date()
@@ -121,14 +139,14 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
     else setter(`${digits.slice(0, 2)}:${digits.slice(2)}`)
   }
 
-  // Pad incomplete entry on blur (e.g. "9" → "09:00")
+  // Pad and clamp on blur (e.g. "9" → "09:00", "89:90" → "23:59")
   function handleTimeBlur(val: string, setter: (v: string) => void) {
     if (!val) return
     const digits = val.replace(/\D/g, '')
     if (digits.length === 0) { setter(''); return }
-    const h = digits.slice(0, 2).padStart(2, '0')
-    const m = (digits.slice(2) || '00').padEnd(2, '0')
-    setter(`${h}:${m}`)
+    const h = Math.min(23, parseInt(digits.slice(0, 2) || '0', 10))
+    const m = Math.min(59, parseInt(digits.slice(2) || '0', 10))
+    setter(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`)
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
