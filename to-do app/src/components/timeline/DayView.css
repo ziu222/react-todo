@@ -389,6 +389,50 @@
   box-shadow: 0 0 0 2px var(--accent-subtle);
 }
 
+/* ── Create / Discard buttons ── */
+.dv-add-actions {
+  display: flex;
+  gap: 6px;
+  padding-top: 2px;
+}
+
+.dv-action-create {
+  flex: 1;
+  padding: 5px 0;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: var(--accent);
+  color: #fff;
+  transition: opacity var(--transition-fast);
+}
+
+.dv-action-create:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dv-action-create:not(:disabled):hover {
+  opacity: 0.88;
+}
+
+.dv-action-discard {
+  flex: 1;
+  padding: 5px 0;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--input-bg);
+  color: var(--text-muted);
+  border: 1.5px solid var(--border-color);
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.dv-action-discard:hover {
+  color: #EF4444;
+  border-color: #EF4444;
+}
+
 /* ── Category header in sub-task list ── */
 .dv-cat-header {
   font-size: 0.62rem;

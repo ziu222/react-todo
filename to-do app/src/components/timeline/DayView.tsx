@@ -216,7 +216,7 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
                   ref={inputRef}
                   className="dv-add-input"
                   type="text"
-                  placeholder="Sub-task name… Enter ✓  Esc ✕"
+                  placeholder="Sub-task name…"
                   value={newSubTitle}
                   onChange={e => setNewSubTitle(e.target.value)}
                   onKeyDown={handleKeyDown}
@@ -232,6 +232,7 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
                     value={newStartTime}
                     onChange={e => handleTimeInput(e.target.value, setNewStartTime)}
                     onBlur={e => handleTimeBlur(e.target.value, setNewStartTime)}
+                    onKeyDown={handleKeyDown}
                     maxLength={5}
                   />
                   <span className="dv-time-sep">→</span>
@@ -243,6 +244,7 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
                     value={newEndTime}
                     onChange={e => handleTimeInput(e.target.value, setNewEndTime)}
                     onBlur={e => handleTimeBlur(e.target.value, setNewEndTime)}
+                    onKeyDown={handleKeyDown}
                     maxLength={5}
                   />
                 </div>
@@ -254,8 +256,30 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
                     placeholder="Category (optional)"
                     value={newCategory}
                     onChange={e => setNewCategory(e.target.value)}
+                    onKeyDown={handleKeyDown}
                     maxLength={50}
                   />
+                </div>
+                <div className="dv-add-actions">
+                  <button
+                    className="dv-action-create"
+                    onClick={() => {
+                      const val = newSubTitle.trim()
+                      if (val) onAddSubTask(
+                        todo.id, val, selectedDayMs,
+                        newStartTime || undefined,
+                        newEndTime   || undefined,
+                        newCategory.trim() || undefined,
+                      )
+                      resetAddForm()
+                    }}
+                    disabled={!newSubTitle.trim()}
+                  >
+                    Create
+                  </button>
+                  <button className="dv-action-discard" onClick={resetAddForm}>
+                    Discard
+                  </button>
                 </div>
               </li>
             ) : (
