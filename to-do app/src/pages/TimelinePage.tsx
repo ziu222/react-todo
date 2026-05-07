@@ -3,6 +3,7 @@ import { useTodosContext } from '../app/TodosContext'
 import TimelineHeader  from '../components/timeline/TimelineHeader'
 import TimelineRow     from '../components/timeline/TimelineRow'
 import TaskDetailModal from '../components/kanban/TaskDetailModal'
+import AddTaskModal    from '../components/kanban/AddTaskModal'
 import DayView         from '../components/timeline/DayView'
 import { toMidnight }  from '../features/todos/model/todoLogic'
 import type { Todo }   from '../features/todos/model/todoLogic'
@@ -32,7 +33,7 @@ export default function TimelinePage() {
     filteredTodos,
     updateStatus,
     deleteTodo,
-    pinTodo,
+    updateTask,
     addSubTask,
     updateSubTaskStatus,
     deleteSubTask,
@@ -43,6 +44,7 @@ export default function TimelinePage() {
     const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1)
   })
   const [selectedTodo,  setSelectedTodo]  = useState<Todo | null>(null)
+  const [editingTodo,   setEditingTodo]   = useState<Todo | null>(null)
   const [selectedDayMs, setSelectedDayMs] = useState<number>(
     () => new Date().setHours(0, 0, 0, 0)
   )
@@ -175,7 +177,17 @@ export default function TimelinePage() {
           onClose={() => setSelectedTodo(null)}
           onUpdateStatus={updateStatus}
           onDelete={deleteTodo}
-          onPin={pinTodo}
+          onEdit={todo => { setSelectedTodo(null); setEditingTodo(todo) }}
+        />
+      )}
+
+      {editingTodo && (
+        <AddTaskModal
+          initialStatus={editingTodo.status}
+          initialTodo={editingTodo}
+          onClose={() => setEditingTodo(null)}
+          onSubmit={() => {}}
+          onUpdate={updates => updateTask(editingTodo.id, updates)}
         />
       )}
     </div>

@@ -1,5 +1,5 @@
-import { useState, useRef, useCallback } from 'react'
-import type { TodoStatus, Priority, Attachment } from '../../features/todos/model/todoLogic'
+import { useState, useRef, useCallback, useEffect } from 'react'
+import type { Todo, TodoStatus, Priority, Attachment } from '../../features/todos/model/todoLogic'
 import { calcProgressPreview } from '../../features/todos/model/todoLogic'
 import './AddTaskModal.css'
 
@@ -19,10 +19,20 @@ function dateStrToMs(s: string): number {
 
 interface AddTaskModalProps {
   initialStatus: TodoStatus
+  initialTodo?:  Todo
   onClose:  () => void
   onSubmit: (data: {
     title:        string
     status:       TodoStatus
+    startDay?:    number
+    endDay?:      number
+    priority?:    Priority
+    tags?:        string[]
+    description?: string
+    attachments?: Attachment[]
+  }) => void
+  onUpdate?: (updates: {
+    title:        string
     startDay?:    number
     endDay?:      number
     priority?:    Priority
@@ -70,20 +80,37 @@ function IconInfo() {
   )
 }
 
-export default function AddTaskModal({ initialStatus, onClose, onSubmit }: AddTaskModalProps) {
-  const todayStr = new Date().toISOString().split('T')[0]
+function msToDateStr(ms: number): string {
+  const d = new Date(ms)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
 
-  const [title,       setTitle]       = useState('')
-  const [startDay,    setStartDay]    = useState('')
-  const [endDay,      setEndDay]      = useState('')
-  const [priority,    setPriority]    = useState<Priority>('medium')
-  const [tags,        setTags]        = useState<string[]>([])
+export default function AddTaskModal({ initialStatus, initialTodo, onClose, onSubmit, onUpdate }: AddTaskModalProps) {
+  const todayStr  = new Date().toISOString().split('T')[0]
+  const isEditing = !!initialTodo
+
+  const [title,       setTitle]       = useState(initialTodo?.title ?? '')
+  const [startDay,    setStartDay]    = useState(initialTodo?.startDay ? msToDateStr(initialTodo.startDay) : '')
+  const [endDay,      setEndDay]      = useState(initialTodo?.endDay   ? msToDateStr(initialTodo.endDay)   : '')
+  const [priority,    setPriority]    = useState<Priority>(initialTodo?.priority ?? 'medium')
+  const [tags,        setTags]        = useState<string[]>(initialTodo?.tags ?? [])
   const [customTag,   setCustomTag]   = useState('')
-  const [description, setDescription] = useState('')
-  const [attachments, setAttachments] = useState<Attachment[]>([])
+  const [description, setDescription] = useState(initialTodo?.description ?? '')
+  const [attachments, setAttachments] = useState<Attachment[]>(initialTodo?.attachments ?? [])
   const [dragging,    setDragging]    = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (!initialTodo) return
+    setTitle(initialTodo.title)
+    setStartDay(initialTodo.startDay ? msToDateStr(initialTodo.startDay) : '')
+    setEndDay(initialTodo.endDay     ? msToDateStr(initialTodo.endDay)   : '')
+    setPriority(initialTodo.priority ?? 'medium')
+    setTags(initialTodo.tags ?? [])
+    setDescription(initialTodo.description ?? '')
+    setAttachments(initialTodo.attachments ?? [])
+  }, [])
 
   // Derive progress from selected dates
   const startMs      = startDay ? dateStrToMs(startDay) : null
@@ -120,24 +147,28 @@ export default function AddTaskModal({ initialStatus, onClose, onSubmit }: AddTa
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!title.trim()) return
-    onSubmit({
+    const payload = {
       title:       title.trim(),
-      status:      initialStatus,
       startDay:    startMs ?? undefined,
       endDay:      endMs   ?? undefined,
       priority,
       tags:        tags.length        ? tags        : undefined,
       description: description.trim() || undefined,
       attachments: attachments.length ? attachments : undefined,
-    })
+    }
+    if (isEditing && onUpdate) {
+      onUpdate(payload)
+    } else {
+      onSubmit({ ...payload, status: initialStatus })
+    }
     onClose()
   }
 
   return (
     <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="modal" role="dialog" aria-modal="true" aria-label="Add new task">
+      <div className="modal" role="dialog" aria-modal="true" aria-label={isEditing ? 'Edit task' : 'Add new task'}>
         <div className="modal-header">
-          <h2 className="modal-title">Add New Task</h2>
+          <h2 className="modal-title">{isEditing ? 'Edit Task' : 'Add New Task'}</h2>
           <button className="modal-close" onClick={onClose} aria-label="Close"><IconX /></button>
         </div>
 
@@ -170,7 +201,7 @@ export default function AddTaskModal({ initialStatus, onClose, onSubmit }: AddTa
                       className="modal-input"
                       type="date"
                       value={startDay}
-                      min={todayStr}
+                      min={isEditing ? undefined : todayStr}
                       onChange={e => {
                         setStartDay(e.target.value)
                         if (endDay && e.target.value > endDay) setEndDay(e.target.value)
@@ -343,7 +374,7 @@ export default function AddTaskModal({ initialStatus, onClose, onSubmit }: AddTa
           {/* ── Footer ── */}
           <div className="modal-footer">
             <button type="button" className="modal-btn cancel" onClick={onClose}>Cancel</button>
-            <button type="submit"  className="modal-btn submit">Add Task</button>
+            <button type="submit"  className="modal-btn submit">{isEditing ? 'Update Task' : 'Add Task'}</button>
           </div>
         </form>
       </div>

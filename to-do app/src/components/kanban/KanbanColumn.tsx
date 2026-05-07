@@ -24,12 +24,12 @@ interface KanbanColumnProps {
   onAdd:          (data: AddTaskData) => void
   onUpdateStatus: (id: string, status: TodoStatus) => void
   onDelete:       (id: string) => void
-  onPin:          (id: string) => void
+  onEdit:         (todo: Todo) => void
 }
 
 export default function KanbanColumn({
   status, label, accentColor, todos, query,
-  onAdd, onUpdateStatus, onDelete, onPin,
+  onAdd, onUpdateStatus, onDelete, onEdit,
 }: KanbanColumnProps) {
   const [modalOpen, setModalOpen] = useState(false)
 
@@ -63,7 +63,7 @@ export default function KanbanColumn({
               query={query}
               onUpdateStatus={onUpdateStatus}
               onDelete={onDelete}
-              onPin={onPin}
+              onEdit={onEdit}
             />
           </li>
         ))}

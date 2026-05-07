@@ -7,7 +7,7 @@ interface TaskDetailModalProps {
   onClose:        () => void
   onUpdateStatus: (id: string, status: TodoStatus) => void
   onDelete:       (id: string) => void
-  onPin:          (id: string) => void
+  onEdit:         (todo: Todo) => void
 }
 
 const STATUS_NEXT: Partial<Record<TodoStatus, TodoStatus>> = {
@@ -54,10 +54,11 @@ function IconCalendar() {
   )
 }
 
-function IconPin({ filled }: { filled: boolean }) {
+function IconEdit() {
   return (
-    <svg viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 2l3 7h6l-5 4 2 7-6-4-6 4 2-7L3 9h6l3-7z" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+      <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
     </svg>
   )
 }
@@ -87,7 +88,7 @@ function IconPaperclip() {
   )
 }
 
-export default function TaskDetailModal({ todo, onClose, onUpdateStatus, onDelete, onPin }: TaskDetailModalProps) {
+export default function TaskDetailModal({ todo, onClose, onUpdateStatus, onDelete, onEdit }: TaskDetailModalProps) {
   const todayMs    = new Date().setHours(0, 0, 0, 0)
   const progress   = (todo.startDay != null && todo.endDay != null) || (todo.subTasks && todo.subTasks.length > 0)
     ? calcProgress(todo)
@@ -226,12 +227,12 @@ export default function TaskDetailModal({ todo, onClose, onUpdateStatus, onDelet
         {/* ── Footer actions ── */}
         <div className="td-footer">
           <button
-            className={`td-action-btn${todo.pinned ? ' active' : ''}`}
-            onClick={() => onPin(todo.id)}
-            aria-label={todo.pinned ? 'Unpin' : 'Pin'}
+            className="td-action-btn"
+            onClick={() => { onEdit(todo); onClose() }}
+            aria-label="Edit task"
           >
-            <IconPin filled={todo.pinned} />
-            {todo.pinned ? 'Unpin' : 'Pin'}
+            <IconEdit />
+            Edit
           </button>
 
           {nextStatus && (
