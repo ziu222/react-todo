@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useTodosContext } from '../../app/TodosContext'
+import type { Todo } from '../../features/todos/model/todoLogic'
 import AddTaskModal from '../kanban/AddTaskModal'
 import KanbanCard from '../kanban/KanbanCard'
 import './TodayPanel.css'
 
 export default function TodayPanel() {
-  const { filteredTodos, query, addTodo, updateStatus, deleteTodo, pinTodo } = useTodosContext()
+  const { filteredTodos, query, addTodo, updateStatus, deleteTodo, updateTask } = useTodosContext()
   const [modalOpen, setModalOpen] = useState(false)
+  const [editingTodo, setEditingTodo] = useState<Todo | null>(null)
 
   const remainingTodos = filteredTodos
     .filter(t => t.status !== 'done')
@@ -32,7 +34,7 @@ export default function TodayPanel() {
               query={query}
               onUpdateStatus={updateStatus}
               onDelete={deleteTodo}
-              onPin={pinTodo}
+              onEdit={setEditingTodo}
             />
           </li>
         ))}
@@ -56,6 +58,16 @@ export default function TodayPanel() {
           initialStatus="todo"
           onClose={() => setModalOpen(false)}
           onSubmit={({ title, ...extras }) => addTodo(title, extras)}
+        />
+      )}
+
+      {editingTodo && (
+        <AddTaskModal
+          initialStatus={editingTodo.status}
+          initialTodo={editingTodo}
+          onClose={() => setEditingTodo(null)}
+          onSubmit={() => {}}
+          onUpdate={updates => updateTask(editingTodo.id, updates)}
         />
       )}
     </aside>
