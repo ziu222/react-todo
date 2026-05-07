@@ -10,7 +10,7 @@ interface KanbanCardProps {
   query:          string
   onUpdateStatus: (id: string, status: TodoStatus) => void
   onDelete:       (id: string) => void
-  onPin:          (id: string) => void
+  onEdit:         (todo: Todo) => void
 }
 
 const STATUS_NEXT: Partial<Record<TodoStatus, TodoStatus>> = {
@@ -71,10 +71,11 @@ function IconBell() {
   )
 }
 
-function IconPin({ filled }: { filled: boolean }) {
+function IconEdit() {
   return (
-    <svg viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 2l3 7h6l-5 4 2 7-6-4-6 4 2-7L3 9h6l3-7z" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+      <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
     </svg>
   )
 }
@@ -114,7 +115,7 @@ const STATUS_ICON: Record<TodoStatus, React.ReactElement> = {
 const fmt = (ms: number) =>
   new Date(ms).toLocaleDateString('en', { month: 'short', day: 'numeric' })
 
-export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onPin }: KanbanCardProps) {
+export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onEdit }: KanbanCardProps) {
   const [detailOpen, setDetailOpen] = useState(false)
   const nextStatus = STATUS_NEXT[todo.status]
   const todayMs    = new Date().setHours(0, 0, 0, 0)
@@ -199,11 +200,11 @@ export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onPi
         )}
         <div className="kc-actions">
           <button
-            className={`kc-btn${todo.pinned ? ' active' : ''}`}
-            onClick={e => { e.stopPropagation(); onPin(todo.id) }}
-            aria-label={todo.pinned ? 'Unpin' : 'Pin'}
+            className="kc-btn"
+            onClick={e => { e.stopPropagation(); onEdit(todo) }}
+            aria-label="Edit task"
           >
-            <IconPin filled={todo.pinned} />
+            <IconEdit />
           </button>
           {nextStatus && (
             <button
@@ -232,7 +233,7 @@ export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onPi
         onClose={() => setDetailOpen(false)}
         onUpdateStatus={onUpdateStatus}
         onDelete={onDelete}
-        onPin={onPin}
+        onEdit={t => { setDetailOpen(false); onEdit(t) }}
       />
     )}
     </>
