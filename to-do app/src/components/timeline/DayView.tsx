@@ -91,6 +91,23 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
     setAddingSubTask(false)
   }
 
+  // Auto-format: digits only → HH:MM as user types
+  function handleTimeInput(raw: string, setter: (v: string) => void) {
+    const digits = raw.replace(/\D/g, '').slice(0, 4)
+    if (digits.length <= 2) setter(digits)
+    else setter(`${digits.slice(0, 2)}:${digits.slice(2)}`)
+  }
+
+  // Pad incomplete entry on blur (e.g. "9" → "09:00")
+  function handleTimeBlur(val: string, setter: (v: string) => void) {
+    if (!val) return
+    const digits = val.replace(/\D/g, '')
+    if (digits.length === 0) { setter(''); return }
+    const h = digits.slice(0, 2).padStart(2, '0')
+    const m = (digits.slice(2) || '00').padEnd(2, '0')
+    setter(`${h}:${m}`)
+  }
+
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') {
       const val = newSubTitle.trim()
@@ -199,26 +216,36 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
                   ref={inputRef}
                   className="dv-add-input"
                   type="text"
-                  placeholder="Sub-task name… Enter ✓  Esc ✕"
+                  placeholder="Sub-task name…"
                   value={newSubTitle}
                   onChange={e => setNewSubTitle(e.target.value)}
                   onKeyDown={handleKeyDown}
                   maxLength={500}
                 />
                 <div className="dv-time-row">
-                  <span className="dv-time-lbl">From</span>
+                  <span className="dv-time-lbl">⏱</span>
                   <input
                     className="dv-time-input"
-                    type="time"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="09:00"
                     value={newStartTime}
-                    onChange={e => setNewStartTime(e.target.value)}
+                    onChange={e => handleTimeInput(e.target.value, setNewStartTime)}
+                    onBlur={e => handleTimeBlur(e.target.value, setNewStartTime)}
+                    onKeyDown={handleKeyDown}
+                    maxLength={5}
                   />
-                  <span className="dv-time-lbl">To</span>
+                  <span className="dv-time-sep">→</span>
                   <input
                     className="dv-time-input"
-                    type="time"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="17:00"
                     value={newEndTime}
-                    onChange={e => setNewEndTime(e.target.value)}
+                    onChange={e => handleTimeInput(e.target.value, setNewEndTime)}
+                    onBlur={e => handleTimeBlur(e.target.value, setNewEndTime)}
+                    onKeyDown={handleKeyDown}
+                    maxLength={5}
                   />
                 </div>
                 <div className="dv-cat-row">
@@ -229,8 +256,30 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
                     placeholder="Category (optional)"
                     value={newCategory}
                     onChange={e => setNewCategory(e.target.value)}
+                    onKeyDown={handleKeyDown}
                     maxLength={50}
                   />
+                </div>
+                <div className="dv-add-actions">
+                  <button
+                    className="dv-action-create"
+                    onClick={() => {
+                      const val = newSubTitle.trim()
+                      if (val) onAddSubTask(
+                        todo.id, val, selectedDayMs,
+                        newStartTime || undefined,
+                        newEndTime   || undefined,
+                        newCategory.trim() || undefined,
+                      )
+                      resetAddForm()
+                    }}
+                    disabled={!newSubTitle.trim()}
+                  >
+                    Create
+                  </button>
+                  <button className="dv-action-discard" onClick={resetAddForm}>
+                    Discard
+                  </button>
                 </div>
               </li>
             ) : (

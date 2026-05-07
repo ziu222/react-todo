@@ -335,26 +335,41 @@
 }
 
 .dv-time-lbl {
-  font-size: 0.67rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
   flex-shrink: 0;
-  min-width: 22px;
+}
+
+.dv-time-sep {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
 }
 
 .dv-time-input {
-  flex: 1;
-  font-size: 0.72rem;
+  width: 54px;
+  flex-shrink: 0;
+  font-size: 0.79rem;
+  font-weight: 600;
   color: var(--text-primary);
   background: var(--input-bg);
   border: 1.5px solid var(--border-color);
   border-radius: var(--radius-sm);
-  padding: 3px 6px;
+  padding: 4px 8px;
   outline: none;
-  min-width: 0;
+  text-align: center;
+  letter-spacing: 0.04em;
 }
 
 .dv-time-input:focus {
   border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-subtle);
+}
+
+.dv-time-input::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
 .dv-cat-input {
@@ -364,13 +379,58 @@
   background: var(--input-bg);
   border: 1.5px solid var(--border-color);
   border-radius: var(--radius-sm);
-  padding: 3px 6px;
+  padding: 4px 8px;
   outline: none;
   min-width: 0;
 }
 
 .dv-cat-input:focus {
   border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-subtle);
+}
+
+/* ── Create / Discard buttons ── */
+.dv-add-actions {
+  display: flex;
+  gap: 6px;
+  padding-top: 2px;
+}
+
+.dv-action-create {
+  flex: 1;
+  padding: 5px 0;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: var(--accent);
+  color: #fff;
+  transition: opacity var(--transition-fast);
+}
+
+.dv-action-create:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dv-action-create:not(:disabled):hover {
+  opacity: 0.88;
+}
+
+.dv-action-discard {
+  flex: 1;
+  padding: 5px 0;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--input-bg);
+  color: var(--text-muted);
+  border: 1.5px solid var(--border-color);
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.dv-action-discard:hover {
+  color: #EF4444;
+  border-color: #EF4444;
 }
 
 /* ── Category header in sub-task list ── */
