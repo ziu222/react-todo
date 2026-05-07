@@ -64,6 +64,7 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
   const [newStartTime,  setNewStartTime]  = useState('')
   const [newEndTime,    setNewEndTime]    = useState('')
   const [newCategory,   setNewCategory]   = useState('')
+  const [timeError,     setTimeError]     = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   const daySubTasks: SubTask[] = (todo.subTasks ?? []).filter(s =>
@@ -87,8 +88,30 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
   }, [addingSubTask])
 
   function resetAddForm() {
-    setNewSubTitle(''); setNewStartTime(''); setNewEndTime(''); setNewCategory('')
+    setNewSubTitle(''); setNewStartTime(''); setNewEndTime('')
+    setNewCategory(''); setTimeError('')
     setAddingSubTask(false)
+  }
+
+  function handleCreate() {
+    const val = newSubTitle.trim()
+    if (!val) return
+    const todayMs = new Date().setHours(0, 0, 0, 0)
+    if (selectedDayMs === todayMs && newStartTime && newEndTime) {
+      const now  = new Date()
+      const nowM = now.getHours() * 60 + now.getMinutes()
+      if (parseHHMM(newEndTime) <= nowM) {
+        setTimeError('End time has already passed — pick a future time or leave times blank')
+        return
+      }
+    }
+    onAddSubTask(
+      todo.id, val, selectedDayMs,
+      newStartTime || undefined,
+      newEndTime   || undefined,
+      newCategory.trim() || undefined,
+    )
+    resetAddForm()
   }
 
   // Auto-format: digits only → HH:MM as user types
@@ -109,16 +132,7 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter') {
-      const val = newSubTitle.trim()
-      if (val) onAddSubTask(
-        todo.id, val, selectedDayMs,
-        newStartTime || undefined,
-        newEndTime   || undefined,
-        newCategory.trim() || undefined,
-      )
-      resetAddForm()
-    }
+    if (e.key === 'Enter') handleCreate()
     if (e.key === 'Escape') resetAddForm()
   }
 
@@ -230,7 +244,7 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
                     inputMode="numeric"
                     placeholder="09:00"
                     value={newStartTime}
-                    onChange={e => handleTimeInput(e.target.value, setNewStartTime)}
+                    onChange={e => { handleTimeInput(e.target.value, setNewStartTime); setTimeError('') }}
                     onBlur={e => handleTimeBlur(e.target.value, setNewStartTime)}
                     onKeyDown={handleKeyDown}
                     maxLength={5}
@@ -242,12 +256,13 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
                     inputMode="numeric"
                     placeholder="17:00"
                     value={newEndTime}
-                    onChange={e => handleTimeInput(e.target.value, setNewEndTime)}
+                    onChange={e => { handleTimeInput(e.target.value, setNewEndTime); setTimeError('') }}
                     onBlur={e => handleTimeBlur(e.target.value, setNewEndTime)}
                     onKeyDown={handleKeyDown}
                     maxLength={5}
                   />
                 </div>
+                {timeError && <p className="dv-time-error">{timeError}</p>}
                 <div className="dv-cat-row">
                   <span className="dv-time-lbl">#</span>
                   <input
@@ -263,16 +278,7 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
                 <div className="dv-add-actions">
                   <button
                     className="dv-action-create"
-                    onClick={() => {
-                      const val = newSubTitle.trim()
-                      if (val) onAddSubTask(
-                        todo.id, val, selectedDayMs,
-                        newStartTime || undefined,
-                        newEndTime   || undefined,
-                        newCategory.trim() || undefined,
-                      )
-                      resetAddForm()
-                    }}
+                    onClick={handleCreate}
                     disabled={!newSubTitle.trim()}
                   >
                     Create
