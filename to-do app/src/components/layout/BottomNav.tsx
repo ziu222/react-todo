@@ -1,4 +1,7 @@
+import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import { useTodosContext } from '../../app/TodosContext'
+import AddTaskModal from '../kanban/AddTaskModal'
 import './BottomNav.css'
 
 function IconDashboard() {
@@ -49,25 +52,38 @@ function IconPlus() {
 }
 
 export default function BottomNav() {
+  const { addTodo } = useTodosContext()
+  const [modalOpen, setModalOpen] = useState(false)
+
   return (
-    <nav className="bottom-nav" aria-label="Mobile navigation">
-      <NavLink to="/"         end className={({ isActive }) => `bottom-nav-link${isActive ? ' active' : ''}`} aria-label="Dashboard">
-        <IconDashboard />
-      </NavLink>
-      <NavLink to="/timeline"     className={({ isActive }) => `bottom-nav-link${isActive ? ' active' : ''}`} aria-label="Timeline">
-        <IconTimeline />
-      </NavLink>
+    <>
+      <nav className="bottom-nav" aria-label="Mobile navigation">
+        <NavLink to="/"         end className={({ isActive }) => `bottom-nav-link${isActive ? ' active' : ''}`} aria-label="Dashboard">
+          <IconDashboard />
+        </NavLink>
+        <NavLink to="/timeline"     className={({ isActive }) => `bottom-nav-link${isActive ? ' active' : ''}`} aria-label="Timeline">
+          <IconTimeline />
+        </NavLink>
 
-      <NavLink to="/tasks"        className="bottom-nav-add" aria-label="Tasks">
-        <IconPlus />
-      </NavLink>
+        <button className="bottom-nav-add" onClick={() => setModalOpen(true)} aria-label="Add task">
+          <IconPlus />
+        </button>
 
-      <NavLink to="/settings"     className={({ isActive }) => `bottom-nav-link${isActive ? ' active' : ''}`} aria-label="Settings">
-        <IconSettings />
-      </NavLink>
-      <NavLink to="/tasks"        className={({ isActive }) => `bottom-nav-link${isActive ? ' active' : ''}`} aria-label="Tasks list">
-        <IconTasks />
-      </NavLink>
-    </nav>
+        <NavLink to="/settings"     className={({ isActive }) => `bottom-nav-link${isActive ? ' active' : ''}`} aria-label="Settings">
+          <IconSettings />
+        </NavLink>
+        <NavLink to="/tasks"        className={({ isActive }) => `bottom-nav-link${isActive ? ' active' : ''}`} aria-label="Tasks">
+          <IconTasks />
+        </NavLink>
+      </nav>
+
+      {modalOpen && (
+        <AddTaskModal
+          initialStatus="todo"
+          onClose={() => setModalOpen(false)}
+          onSubmit={({ title, ...extras }) => { addTodo(title, extras); setModalOpen(false) }}
+        />
+      )}
+    </>
   )
 }
