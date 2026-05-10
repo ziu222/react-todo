@@ -114,6 +114,35 @@
   cursor: pointer;
 }
 
+.settings-data-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.settings-data-btn {
+  padding: 8px 18px;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: var(--input-bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.settings-data-btn:hover {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border-color: var(--accent-light);
+}
+
+.settings-import-msg {
+  font-size: 0.82rem;
+  color: var(--accent);
+  margin: 0;
+}
+
 @media (max-width: 560px) {
   .settings-row {
     grid-template-columns: 1fr;

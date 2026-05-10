@@ -4,7 +4,7 @@ const STORAGE_KEY = 'todos:v1'
 
 const VALID_STATUSES: TodoStatus[] = ['backlog', 'todo', 'in-progress', 'done']
 
-function isValidTodo(item: unknown): item is Todo {
+export function isValidTodo(item: unknown): item is Todo {
   if (typeof item !== 'object' || item === null) return false
   const t = item as Record<string, unknown>
   if (
@@ -22,6 +22,7 @@ function isValidTodo(item: unknown): item is Todo {
   if (t.priority    !== undefined && !['low','medium','high'].includes(t.priority as string)) return false
   if (t.tags        !== undefined && !Array.isArray(t.tags))             return false
   if (t.description !== undefined && typeof t.description !== 'string')  return false
+  if (t.emoji       !== undefined && typeof t.emoji       !== 'string')  return false
   if (t.attachments !== undefined && !Array.isArray(t.attachments))      return false
   if (t.subTasks !== undefined) {
     if (!Array.isArray(t.subTasks)) return false

@@ -3,6 +3,7 @@ import { useTodosContext } from '../../app/TodosContext'
 import type { Todo, TodoStatus } from '../../features/todos/model/todoLogic'
 import KanbanColumn from './KanbanColumn'
 import AddTaskModal from './AddTaskModal'
+import BulkActionBar from './BulkActionBar'
 import './KanbanBoard.css'
 
 const COLUMNS: { status: TodoStatus; label: string; color: string }[] = [
@@ -14,8 +15,27 @@ const COLUMNS: { status: TodoStatus; label: string; color: string }[] = [
 
 export default function KanbanBoard() {
   const { filteredTodos, query, addTodo, updateStatus, deleteTodo, updateTask } = useTodosContext()
-  const [editingTodo, setEditingTodo] = useState<Todo | null>(null)
+  const [editingTodo,  setEditingTodo]  = useState<Todo | null>(null)
+  const [selectedIds,  setSelectedIds]  = useState<Set<string>>(new Set())
   const boardRef = useRef<HTMLDivElement>(null)
+
+  function toggleSelect(id: string) {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  function bulkMove(status: TodoStatus) {
+    selectedIds.forEach(id => updateStatus(id, status))
+    setSelectedIds(new Set())
+  }
+
+  function bulkDelete() {
+    selectedIds.forEach(id => deleteTodo(id))
+    setSelectedIds(new Set())
+  }
 
   useEffect(() => {
     const board = boardRef.current
@@ -50,6 +70,8 @@ export default function KanbanBoard() {
             accentColor={col.color}
             todos={filteredTodos.filter(t => t.status === col.status)}
             query={query}
+            selectedIds={selectedIds}
+            onToggleSelect={toggleSelect}
             onAdd={({ title, ...extras }) => addTodo(title, extras)}
             onUpdateStatus={updateStatus}
             onDelete={deleteTodo}
@@ -63,6 +85,15 @@ export default function KanbanBoard() {
           <span key={col.status} className="kanban-dot" />
         ))}
       </div>
+
+      {selectedIds.size > 0 && (
+        <BulkActionBar
+          count={selectedIds.size}
+          onMoveAll={bulkMove}
+          onDeleteAll={bulkDelete}
+          onClear={() => setSelectedIds(new Set())}
+        />
+      )}
 
       {editingTodo && (
         <AddTaskModal

@@ -16,19 +16,22 @@ export interface AddTaskData {
 }
 
 interface KanbanColumnProps {
-  status:         TodoStatus
-  label:          string
-  accentColor:    string
-  todos:          Todo[]
-  query:          string
-  onAdd:          (data: AddTaskData) => void
-  onUpdateStatus: (id: string, status: TodoStatus) => void
-  onDelete:       (id: string) => void
-  onEdit:         (todo: Todo) => void
+  status:          TodoStatus
+  label:           string
+  accentColor:     string
+  todos:           Todo[]
+  query:           string
+  selectedIds:     Set<string>
+  onToggleSelect:  (id: string) => void
+  onAdd:           (data: AddTaskData) => void
+  onUpdateStatus:  (id: string, status: TodoStatus) => void
+  onDelete:        (id: string) => void
+  onEdit:          (todo: Todo) => void
 }
 
 export default function KanbanColumn({
   status, label, accentColor, todos, query,
+  selectedIds, onToggleSelect,
   onAdd, onUpdateStatus, onDelete, onEdit,
 }: KanbanColumnProps) {
   const [modalOpen, setModalOpen] = useState(false)
@@ -61,6 +64,8 @@ export default function KanbanColumn({
             <KanbanCard
               todo={todo}
               query={query}
+              isSelected={selectedIds.has(todo.id)}
+              onToggleSelect={onToggleSelect}
               onUpdateStatus={onUpdateStatus}
               onDelete={onDelete}
               onEdit={onEdit}

@@ -6,11 +6,13 @@ import TaskDetailModal from './TaskDetailModal'
 import './KanbanCard.css'
 
 interface KanbanCardProps {
-  todo:           Todo
-  query:          string
-  onUpdateStatus: (id: string, status: TodoStatus) => void
-  onDelete:       (id: string) => void
-  onEdit:         (todo: Todo) => void
+  todo:            Todo
+  query:           string
+  isSelected:      boolean
+  onToggleSelect:  (id: string) => void
+  onUpdateStatus:  (id: string, status: TodoStatus) => void
+  onDelete:        (id: string) => void
+  onEdit:          (todo: Todo) => void
 }
 
 const STATUS_NEXT: Partial<Record<TodoStatus, TodoStatus>> = {
@@ -115,7 +117,7 @@ const STATUS_ICON: Record<TodoStatus, React.ReactElement> = {
 const fmt = (ms: number) =>
   new Date(ms).toLocaleDateString('en', { month: 'short', day: 'numeric' })
 
-export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onEdit }: KanbanCardProps) {
+export default function KanbanCard({ todo, query, isSelected, onToggleSelect, onUpdateStatus, onDelete, onEdit }: KanbanCardProps) {
   const [detailOpen, setDetailOpen] = useState(false)
   const nextStatus = STATUS_NEXT[todo.status]
   const todayMs    = new Date().setHours(0, 0, 0, 0)
@@ -127,11 +129,20 @@ export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onEd
   return (
     <>
     <article
-      className={`kc-card${todo.pinned ? ' pinned' : ''}`}
+      className={`kc-card${todo.pinned ? ' pinned' : ''}${isSelected ? ' selected' : ''}`}
       data-status={todo.status}
       onClick={() => setDetailOpen(true)}
       style={{ cursor: 'pointer' }}
     >
+      {/* ── Checkbox ── */}
+      <input
+        type="checkbox"
+        className="kc-checkbox"
+        checked={isSelected}
+        onChange={() => onToggleSelect(todo.id)}
+        onClick={e => e.stopPropagation()}
+        aria-label={`Select ${todo.title}`}
+      />
 
       {/* ── Left: status orb + dates ── */}
       <div className="kc-left">
@@ -163,7 +174,10 @@ export default function KanbanCard({ todo, query, onUpdateStatus, onDelete, onEd
 
       {/* ── Center: title + tags ── */}
       <div className="kc-body">
-        <p className="kc-title">{highlightMatchingText(todo.title, query)}</p>
+        <p className="kc-title">
+          {todo.emoji && <span className="kc-emoji">{todo.emoji}</span>}
+          {highlightMatchingText(todo.title, query)}
+        </p>
         <div className="kc-meta-row">
           {todo.tags?.slice(0, 2).map(t => (
             <span key={t} className="kc-tag">{t}</span>
