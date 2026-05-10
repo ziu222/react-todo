@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useUserContext } from '../app/UserContext'
+import { useTodosContext } from '../app/TodosContext'
+import { loadTodos, isValidTodo } from '../features/todos/api/storage'
 import ProfileBanner from '../components/settings/ProfileBanner'
 import ThemeSelector from '../components/settings/ThemeSelector'
 import './SettingsPage.css'
@@ -9,6 +11,36 @@ type Tab = 'details' | 'theme'
 export default function SettingsPage() {
   const [tab, setTab] = useState<Tab>('details')
   const { user, setFirstName, setLastName, setEmail, setCoverColor } = useUserContext()
+  const { importTodos } = useTodosContext()
+  const importInputRef = useRef<HTMLInputElement>(null)
+  const [importMsg, setImportMsg] = useState('')
+
+  function handleExport() {
+    const todos = loadTodos() ?? []
+    const blob = new Blob([JSON.stringify(todos, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `todos-${new Date().toISOString().split('T')[0]}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  function handleImportFile(file: File) {
+    const reader = new FileReader()
+    reader.onload = e => {
+      try {
+        const raw = JSON.parse(e.target?.result as string)
+        if (!Array.isArray(raw)) throw new Error()
+        const valid = raw.filter(isValidTodo)
+        importTodos(valid)
+        setImportMsg(`Imported ${valid.length} task${valid.length !== 1 ? 's' : ''}.`)
+      } catch {
+        setImportMsg('Invalid backup file — no tasks imported.')
+      }
+    }
+    reader.readAsText(file)
+  }
 
   return (
     <div className="settings-page">
@@ -69,6 +101,24 @@ export default function SettingsPage() {
                 maxLength={200}
               />
             </label>
+
+            <h3 className="settings-section-title" style={{ marginTop: 24 }}>Data</h3>
+            <div className="settings-data-row">
+              <button className="settings-data-btn" onClick={handleExport}>
+                ⬇ Export tasks
+              </button>
+              <button className="settings-data-btn" onClick={() => importInputRef.current?.click()}>
+                ⬆ Import tasks
+              </button>
+              <input
+                ref={importInputRef}
+                type="file"
+                accept=".json"
+                className="sr-only"
+                onChange={e => { if (e.target.files?.[0]) handleImportFile(e.target.files[0]); e.target.value = '' }}
+              />
+            </div>
+            {importMsg && <p className="settings-import-msg">{importMsg}</p>}
 
             <h3 className="settings-section-title" style={{ marginTop: 24 }}>Appearance</h3>
             <label className="settings-label">
