@@ -22,6 +22,38 @@
   border-left: 3px solid var(--accent);
 }
 
+.kc-card.selected {
+  background: var(--accent-subtle);
+  border-color: var(--accent-light);
+  box-shadow: 0 0 0 2px var(--accent-light);
+}
+
+/* ── Checkbox ── */
+.kc-checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  z-index: 1;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.kc-card:hover .kc-checkbox,
+.kc-card.selected .kc-checkbox {
+  opacity: 1;
+  position: relative;
+  accent-color: var(--accent);
+}
+
+/* ── Emoji ── */
+.kc-emoji {
+  font-size: 1rem;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
 /* ── Left: orb + dates ── */
 .kc-left {
   display: flex;
