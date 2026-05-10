@@ -1,0 +1,235 @@
+/* ── Page enter ── */
+.about-page {
+  max-width: 860px;
+  animation: slide-up-fade 280ms ease both;
+}
+
+/* ── Hero ── */
+.ab-hero {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+  padding: 64px 48px;
+  border-radius: var(--radius-lg);
+  color: #fff;
+  margin-bottom: 56px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ab-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(255, 255, 255, 0.08), transparent);
+  pointer-events: none;
+}
+
+/* Decorative background text */
+.ab-hero::after {
+  content: 'TF';
+  position: absolute;
+  right: 32px;
+  bottom: -20px;
+  font-size: 11rem;
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  color: rgba(255, 255, 255, 0.06);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.ab-hero-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  margin-bottom: 14px;
+}
+
+.ab-hero-title {
+  font-size: clamp(3rem, 6vw, 5.5rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 0.92;
+  margin: 0 0 18px;
+}
+
+.ab-hero-sub {
+  font-size: 1.05rem;
+  opacity: 0.85;
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+.ab-hero-version {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 3px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* ── Scroll-reveal ── */
+.reveal-block {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+.reveal-block.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Section label ── */
+.ab-section-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 20px;
+}
+
+/* ── Features grid ── */
+.ab-features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 56px;
+}
+
+.ab-feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background var(--transition-fast);
+  animation: slide-up-fade 400ms ease both;
+}
+
+.ab-feature-card:hover {
+  transform: translateY(-4px);
+  background: var(--bg-card-hover);
+  box-shadow: var(--card-shadow), 0 8px 28px rgba(0, 0, 0, 0.1);
+}
+
+.ab-feature-card:nth-child(2) { animation-delay: 80ms; }
+.ab-feature-card:nth-child(3) { animation-delay: 160ms; }
+.ab-feature-card:nth-child(4) { animation-delay: 240ms; }
+.ab-feature-card:nth-child(5) { animation-delay: 320ms; }
+.ab-feature-card:nth-child(6) { animation-delay: 400ms; }
+
+.ab-feature-icon  { font-size: 1.7rem; line-height: 1; }
+.ab-feature-title { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); }
+.ab-feature-desc  { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.55; }
+
+/* ── Developer card ── */
+.ab-dev-card {
+  background: var(--bg-card);
+  border: 1px solid var(--card-border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: 22px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ab-dev-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--card-shadow), 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.ab-dev-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.ab-dev-name  { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
+.ab-dev-email { font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; }
+.ab-dev-role  {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-top: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Tech stack ── */
+.ab-tech-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 32px;
+}
+
+.ab-tech-badge {
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--accent-light);
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  cursor: default;
+}
+
+.ab-tech-badge:hover {
+  background: var(--accent);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .ab-hero {
+    padding: 40px 24px;
+  }
+
+  .ab-hero-title {
+    font-size: clamp(2.4rem, 8vw, 3.5rem);
+  }
+
+  .ab-features-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .ab-hero {
+    padding: 32px 20px;
+  }
+
+  .ab-features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ab-dev-card {
+    flex-direction: column;
+    text-align: center;
+  }
+}
