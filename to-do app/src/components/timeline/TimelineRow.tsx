@@ -70,13 +70,16 @@ export default function TimelineRow({ todo, visibleDays, onOpenDetail, onDayClic
           role="button"
           tabIndex={0}
           onKeyDown={e => e.key === 'Enter' && onOpenDetail(todo)}
-          title={`${todo.title} · ${progress}%`}
+          title={`${todo.emoji ? todo.emoji + ' ' : ''}${todo.title} · ${progress}%`}
         >
           <div className="tl-pill-bg" />
           <div className="tl-pill-fill" style={{ width: `${progress}%` }} />
           <div className="tl-pill-content">
             <span className="tl-pill-dot" />
-            <span className="tl-pill-name">{todo.title}</span>
+            <span className="tl-pill-name">
+              {todo.emoji && <span className="tl-emoji">{todo.emoji}</span>}
+              {todo.title}
+            </span>
             <div className="tl-pill-meta">
               <span className="tl-pill-pct">{progress}%</span>
               <span className="tl-pill-arrow">›</span>
