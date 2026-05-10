@@ -260,6 +260,9 @@
 .td-action-btn.advance      { margin-left: auto; }
 .td-action-btn.delete:hover { background: rgba(239,68,68,0.08); color: #EF4444; border-color: rgba(239,68,68,0.3); }
 
+/* ── Emoji ── */
+.td-emoji { margin-right: 6px; font-size: 1.1rem; }
+
 /* ── Mobile: full-screen bottom sheet ── */
 @media (max-width: 640px) {
   .td-backdrop {
