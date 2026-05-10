@@ -50,10 +50,8 @@ export default function AboutPage() {
 
       {/* ── Hero ── */}
       <section className="ab-hero">
-        <div className="ab-hero-eyebrow">Task Management · Redesigned</div>
-        <h1 className="ab-hero-title">TASKFLOW</h1>
-        <p className="ab-hero-sub">Your intelligent, beautiful task manager</p>
-        <span className="ab-hero-version">v1.0</span>
+        <div className="ab-hero-eyebrow">Task Management React</div>
+        <h1 className="ab-hero-title">FEATURE</h1>
       </section>
 
       {/* ── Features ── */}
@@ -85,7 +83,7 @@ export default function AboutPage() {
           <div>
             <div className="ab-dev-name">{user.firstName}{user.lastName ? ` ${user.lastName}` : ''}</div>
             <div className="ab-dev-email">{user.email}</div>
-            <div className="ab-dev-role">Full-Stack Developer</div>
+            <div className="ab-dev-role">Full-Stack Developer in Future :D(FE rn)</div>
           </div>
         </div>
       </section>
