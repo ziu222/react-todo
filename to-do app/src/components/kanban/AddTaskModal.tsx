@@ -12,37 +12,22 @@ const PRIORITY_OPTIONS: { value: Priority; label: string }[] = [
   { value: 'high',   label: 'High Priority'   },
 ]
 
-// Parse a YYYY-MM-DD string as local midnight timestamp
+type TabId = 'details' | 'organize' | 'files' | 'notes'
+const TABS: { id: TabId; label: string }[] = [
+  { id: 'details',  label: 'Details'  },
+  { id: 'organize', label: 'Organize' },
+  { id: 'files',    label: 'Files'    },
+  { id: 'notes',    label: 'Notes'    },
+]
+
 function dateStrToMs(s: string): number {
   const [y, m, d] = s.split('-').map(Number)
   return new Date(y, m - 1, d).getTime()
 }
 
-interface AddTaskModalProps {
-  initialStatus: TodoStatus
-  initialTodo?:  Todo
-  onClose:  () => void
-  onSubmit: (data: {
-    title:        string
-    status:       TodoStatus
-    emoji?:       string
-    startDay?:    number
-    endDay?:      number
-    priority?:    Priority
-    tags?:        string[]
-    description?: string
-    attachments?: Attachment[]
-  }) => void
-  onUpdate?: (updates: {
-    title:        string
-    emoji?:       string
-    startDay?:    number
-    endDay?:      number
-    priority?:    Priority
-    tags?:        string[]
-    description?: string
-    attachments?: Attachment[]
-  }) => void
+function msToDateStr(ms: number): string {
+  const d = new Date(ms)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 function readFileAsBase64(file: File): Promise<Attachment> {
@@ -53,6 +38,8 @@ function readFileAsBase64(file: File): Promise<Attachment> {
     reader.readAsDataURL(file)
   })
 }
+
+// ── Icons ──────────────────────────────────────────────────────────────────
 
 function IconUpload() {
   return (
@@ -83,25 +70,108 @@ function IconInfo() {
   )
 }
 
-function msToDateStr(ms: number): string {
-  const d = new Date(ms)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+function IconChevron() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  )
 }
+
+// ── Custom priority select ──────────────────────────────────────────────────
+
+function PrioritySelect({ value, onChange }: { value: Priority; onChange: (v: Priority) => void }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function onOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', onOutside)
+    return () => document.removeEventListener('mousedown', onOutside)
+  }, [open])
+
+  const selected = PRIORITY_OPTIONS.find(o => o.value === value)!
+
+  return (
+    <div className="cs-wrap" ref={ref}>
+      <button
+        type="button"
+        className={`cs-trigger${open ? ' open' : ''}`}
+        onClick={() => setOpen(o => !o)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span>{selected.label}</span>
+        <span className="cs-chevron"><IconChevron /></span>
+      </button>
+      {open && (
+        <ul className="cs-dropdown" role="listbox" aria-label="Priority">
+          {PRIORITY_OPTIONS.map(o => (
+            <li
+              key={o.value}
+              role="option"
+              aria-selected={o.value === value}
+              className={`cs-option${o.value === value ? ' active' : ''}`}
+              onClick={() => { onChange(o.value); setOpen(false) }}
+            >
+              {o.label}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
+// ── Props ───────────────────────────────────────────────────────────────────
+
+interface AddTaskModalProps {
+  initialStatus: TodoStatus
+  initialTodo?:  Todo
+  onClose:  () => void
+  onSubmit: (data: {
+    title:        string
+    status:       TodoStatus
+    emoji?:       string
+    startDay?:    number
+    endDay?:      number
+    priority?:    Priority
+    tags?:        string[]
+    description?: string
+    attachments?: Attachment[]
+  }) => void
+  onUpdate?: (updates: {
+    title:        string
+    emoji?:       string
+    startDay?:    number
+    endDay?:      number
+    priority?:    Priority
+    tags?:        string[]
+    description?: string
+    attachments?: Attachment[]
+  }) => void
+}
+
+// ── Main component ──────────────────────────────────────────────────────────
 
 export default function AddTaskModal({ initialStatus, initialTodo, onClose, onSubmit, onUpdate }: AddTaskModalProps) {
   const todayStr  = new Date().toISOString().split('T')[0]
   const isEditing = !!initialTodo
 
-  const [title,       setTitle]       = useState(initialTodo?.title ?? '')
-  const [emoji,       setEmoji]       = useState(initialTodo?.emoji ?? '')
-  const [startDay,    setStartDay]    = useState(initialTodo?.startDay ? msToDateStr(initialTodo.startDay) : '')
-  const [endDay,      setEndDay]      = useState(initialTodo?.endDay   ? msToDateStr(initialTodo.endDay)   : '')
-  const [priority,    setPriority]    = useState<Priority>(initialTodo?.priority ?? 'medium')
-  const [tags,        setTags]        = useState<string[]>(initialTodo?.tags ?? [])
-  const [customTag,   setCustomTag]   = useState('')
-  const [description, setDescription] = useState(initialTodo?.description ?? '')
-  const [attachments, setAttachments] = useState<Attachment[]>(initialTodo?.attachments ?? [])
-  const [dragging,    setDragging]    = useState(false)
+  const [activeTab,    setActiveTab]    = useState<TabId>('details')
+  const [title,        setTitle]        = useState(initialTodo?.title ?? '')
+  const [emoji,        setEmoji]        = useState(initialTodo?.emoji ?? '')
+  const [startDay,     setStartDay]     = useState(initialTodo?.startDay ? msToDateStr(initialTodo.startDay) : '')
+  const [endDay,       setEndDay]       = useState(initialTodo?.endDay   ? msToDateStr(initialTodo.endDay)   : '')
+  const [priority,     setPriority]     = useState<Priority>(initialTodo?.priority ?? 'medium')
+  const [tags,         setTags]         = useState<string[]>(initialTodo?.tags ?? [])
+  const [customTag,    setCustomTag]    = useState('')
+  const [description,  setDescription]  = useState(initialTodo?.description ?? '')
+  const [attachments,  setAttachments]  = useState<Attachment[]>(initialTodo?.attachments ?? [])
+  const [dragging,     setDragging]     = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -117,7 +187,6 @@ export default function AddTaskModal({ initialStatus, initialTodo, onClose, onSu
     setAttachments(initialTodo.attachments ?? [])
   }, [])
 
-  // Derive progress from selected dates
   const startMs      = startDay ? dateStrToMs(startDay) : null
   const endMs        = endDay   ? dateStrToMs(endDay)   : null
   const todayMs      = new Date().setHours(0, 0, 0, 0)
@@ -173,19 +242,41 @@ export default function AddTaskModal({ initialStatus, initialTodo, onClose, onSu
   return (
     <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div className="modal" role="dialog" aria-modal="true" aria-label={isEditing ? 'Edit task' : 'Add new task'}>
+
+        {/* ── Header ── */}
         <div className="modal-header">
           <h2 className="modal-title">{isEditing ? 'Edit Task' : 'Add New Task'}</h2>
           <button className="modal-close" onClick={onClose} aria-label="Close"><IconX /></button>
         </div>
 
-        <form className="modal-body" onSubmit={handleSubmit}>
-          <div className="modal-grid">
-            {/* ── Left column ── */}
-            <div className="modal-col">
-              {/* Card 1: Task Details */}
-              <div className="modal-card">
-                <h3 className="modal-card-title">Task Details</h3>
+        {/* ── Tab bar ── */}
+        <div className="modal-tabs" role="tablist">
+          {TABS.map(tab => (
+            <button
+              key={tab.id}
+              role="tab"
+              className={`modal-tab${activeTab === tab.id ? ' active' : ''}`}
+              aria-selected={activeTab === tab.id}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+              {tab.id === 'files' && attachments.length > 0 && (
+                <span className="modal-tab-badge">{attachments.length}</span>
+              )}
+              {tab.id === 'organize' && tags.length > 0 && (
+                <span className="modal-tab-badge">{tags.length}</span>
+              )}
+            </button>
+          ))}
+        </div>
 
+        {/* ── Form ── */}
+        <form className="modal-body" onSubmit={handleSubmit}>
+          <div key={activeTab} className="modal-tab-content">
+
+            {/* ── Details tab ── */}
+            {activeTab === 'details' && (
+              <div className="modal-card">
                 <label className="modal-field-label">
                   TASK TITLE
                   <input
@@ -254,15 +345,7 @@ export default function AddTaskModal({ initialStatus, initialTodo, onClose, onSu
 
                 <label className="modal-field-label">
                   PRIORITY
-                  <select
-                    className="modal-input modal-select"
-                    value={priority}
-                    onChange={e => setPriority(e.target.value as Priority)}
-                  >
-                    {PRIORITY_OPTIONS.map(o => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
+                  <PrioritySelect value={priority} onChange={setPriority} />
                 </label>
 
                 {willBeDone && (
@@ -272,11 +355,11 @@ export default function AddTaskModal({ initialStatus, initialTodo, onClose, onSu
                   </div>
                 )}
               </div>
+            )}
 
-              {/* Card 2: Categorization */}
+            {/* ── Organize tab ── */}
+            {activeTab === 'organize' && (
               <div className="modal-card">
-                <h3 className="modal-card-title">Categorization</h3>
-
                 <div className="modal-field-label">
                   CATEGORY TAGS
                   <div className="tag-row">
@@ -336,13 +419,11 @@ export default function AddTaskModal({ initialStatus, initialTodo, onClose, onSu
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* ── Right column ── */}
-            <div className="modal-col">
-              {/* Card 3: Attachments */}
+            {/* ── Files tab ── */}
+            {activeTab === 'files' && (
               <div className="modal-card">
-                <h3 className="modal-card-title">Attachments</h3>
                 <div
                   className={`drop-zone${dragging ? ' dragging' : ''}`}
                   onDragOver={e => { e.preventDefault(); setDragging(true)  }}
@@ -383,16 +464,17 @@ export default function AddTaskModal({ initialStatus, initialTodo, onClose, onSu
                   </ul>
                 )}
               </div>
+            )}
 
-              {/* Card 4: Description */}
+            {/* ── Notes tab ── */}
+            {activeTab === 'notes' && (
               <div className="modal-card">
-                <h3 className="modal-card-title">Description &amp; Notes</h3>
                 <textarea
                   className="modal-textarea"
                   placeholder="Provide a detailed description of the task requirements..."
                   value={description}
                   onChange={e => setDescription(e.target.value)}
-                  rows={5}
+                  rows={7}
                   maxLength={2000}
                 />
                 <div className="modal-info-banner">
@@ -400,13 +482,15 @@ export default function AddTaskModal({ initialStatus, initialTodo, onClose, onSu
                   <p>Saved details will appear on the task card and in the timeline view.</p>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* ── Footer ── */}
           <div className="modal-footer">
             <button type="button" className="modal-btn cancel" onClick={onClose}>Cancel</button>
-            <button type="submit"  className="modal-btn submit">{isEditing ? 'Update Task' : 'Add Task'}</button>
+            <button type="submit" className="modal-btn submit" disabled={!title.trim()}>
+              {isEditing ? 'Update Task' : 'Add Task'}
+            </button>
           </div>
         </form>
       </div>
