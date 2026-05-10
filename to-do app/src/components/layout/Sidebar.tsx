@@ -106,6 +106,7 @@ export default function Sidebar() {
             key={to}
             to={to}
             end={to === '/'}
+            viewTransition
             className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}
             aria-label={label}
           >
