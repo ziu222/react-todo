@@ -45,3 +45,23 @@
 .task-chart-tab:hover:not(.active) {
   color: var(--accent);
 }
+
+@media (max-width: 640px) {
+  .task-chart-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .task-chart-title {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .task-chart-tabs {
+    flex-shrink: 0;
+  }
+  .task-chart-tab {
+    padding: 4px 8px;
+  }
+}
