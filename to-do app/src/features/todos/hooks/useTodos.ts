@@ -6,7 +6,7 @@ import {
   selectCounts,
 } from '../model/todoLogic'
 import { loadTodos, saveTodos } from '../api/storage'
-import type { Filter, TodoStatus, Priority, Attachment } from '../model/todoLogic'
+import type { Filter, TodoStatus, Priority, Attachment, Todo } from '../model/todoLogic'
 
 interface AddSubTaskExtras {
   date?:        number
@@ -44,6 +44,16 @@ export function useTodos() {
     saveTodos(state.todos)
   }, [state.todos])
 
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key !== 'todos:v1') return
+      const saved = loadTodos()
+      if (saved !== null) dispatch({ type: 'HYDRATE', payload: { todos: saved } })
+    }
+    window.addEventListener('storage', handleStorage)
+    return () => window.removeEventListener('storage', handleStorage)
+  }, [])
+
   return {
     filteredTodos: selectFilteredTodos(state.todos, state.filter, state.query),
     counts:        selectCounts(state.todos),
@@ -65,5 +75,6 @@ export function useTodos() {
       title?: string; startDay?: number; endDay?: number;
       priority?: Priority; tags?: string[]; description?: string; attachments?: Attachment[]
     }) => dispatch({ type: 'UPDATE_TASK', payload: { id, ...updates } }),
+    importTodos: (todos: Todo[]) => dispatch({ type: 'HYDRATE', payload: { todos } }),
   }
 }
