@@ -178,7 +178,10 @@ function DayTaskCard({ todo, selectedDayMs, onAddSubTask, onUpdateSubTaskStatus,
         <span className="dv-time-label">{timeLabel}</span>
       </div>
 
-      <p className="dv-card-title">{todo.title}</p>
+      <p className="dv-card-title">
+        {todo.emoji && <span className="dv-emoji">{todo.emoji}</span>}
+        {todo.title}
+      </p>
 
       {todo.description && (
         <p className="dv-card-desc">{todo.description}</p>

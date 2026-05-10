@@ -18,6 +18,7 @@ interface AddSubTaskExtras {
 interface AddTodoExtras {
   status?:      TodoStatus
   color?:       string
+  emoji?:       string
   startDay?:    number
   endDay?:      number
   priority?:    Priority
@@ -72,7 +73,7 @@ export function useTodos() {
     deleteSubTask:       (parentId: string, subId: string) =>
       dispatch({ type: 'DELETE_SUBTASK', payload: { parentId, subId } }),
     updateTask: (id: string, updates: {
-      title?: string; startDay?: number; endDay?: number;
+      title?: string; emoji?: string; startDay?: number; endDay?: number;
       priority?: Priority; tags?: string[]; description?: string; attachments?: Attachment[]
     }) => dispatch({ type: 'UPDATE_TASK', payload: { id, ...updates } }),
     importTodos: (todos: Todo[]) => dispatch({ type: 'HYDRATE', payload: { todos } }),

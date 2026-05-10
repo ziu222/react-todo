@@ -121,7 +121,10 @@ export default function TaskDetailModal({ todo, onClose, onUpdateStatus, onDelet
             >
               {STATUS_LABEL[todo.status]}
             </span>
-            <h2 className="td-title">{todo.title}</h2>
+            <h2 className="td-title">
+              {todo.emoji && <span className="td-emoji">{todo.emoji}</span>}
+              {todo.title}
+            </h2>
           </div>
           <button className="td-close" onClick={onClose} aria-label="Close">
             <IconX />

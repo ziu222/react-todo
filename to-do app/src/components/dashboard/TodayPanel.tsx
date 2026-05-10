@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { useTodosContext } from '../../app/TodosContext'
 import type { Todo } from '../../features/todos/model/todoLogic'
 import AddTaskModal from '../kanban/AddTaskModal'
-import KanbanCard from '../kanban/KanbanCard'
+import TodayCard from './TodayCard'
 import './TodayPanel.css'
 
 export default function TodayPanel() {
-  const { filteredTodos, query, addTodo, updateStatus, deleteTodo, updateTask } = useTodosContext()
+  const { filteredTodos, addTodo, updateStatus, deleteTodo, updateTask } = useTodosContext()
   const [modalOpen, setModalOpen] = useState(false)
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null)
 
@@ -29,9 +29,8 @@ export default function TodayPanel() {
         )}
         {remainingTodos.map(todo => (
           <li key={todo.id}>
-            <KanbanCard
+            <TodayCard
               todo={todo}
-              query={query}
               onUpdateStatus={updateStatus}
               onDelete={deleteTodo}
               onEdit={setEditingTodo}
