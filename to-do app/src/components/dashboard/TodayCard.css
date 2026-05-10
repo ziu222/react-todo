@@ -12,7 +12,14 @@
   gap: 8px;
   cursor: pointer;
   transition: box-shadow 0.15s, transform 0.15s, background var(--transition-fast);
+  animation: slide-up-fade 240ms ease both;
 }
+
+.today-list li:nth-child(2) .tc-card { animation-delay: 50ms; }
+.today-list li:nth-child(3) .tc-card { animation-delay: 100ms; }
+.today-list li:nth-child(4) .tc-card { animation-delay: 150ms; }
+.today-list li:nth-child(5) .tc-card { animation-delay: 200ms; }
+.today-list li:nth-child(n+6) .tc-card { animation-delay: 240ms; }
 
 .tc-card:hover {
   background: var(--bg-card-hover);
