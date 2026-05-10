@@ -26,6 +26,7 @@ export interface Todo {
   createdAt:    number
   pinned:       boolean
   color:        string
+  emoji?:       string        // single emoji character, e.g. "🔥"
   startDay?:    number        // Unix ms, local midnight of start date
   endDay?:      number        // Unix ms, local midnight of end date
   priority?:    Priority
@@ -100,6 +101,7 @@ export type TodoAction =
   | { type: 'ADD'; payload: {
       title:        string
       color?:       string
+      emoji?:       string
       startDay?:    number
       endDay?:      number
       priority?:    Priority
@@ -120,6 +122,7 @@ export type TodoAction =
   | { type: 'UPDATE_TASK'; payload: {
       id:           string
       title?:       string
+      emoji?:       string
       startDay?:    number
       endDay?:      number
       priority?:    Priority
