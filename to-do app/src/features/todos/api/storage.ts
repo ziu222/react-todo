@@ -4,7 +4,7 @@ const STORAGE_KEY = 'todos:v1'
 
 const VALID_STATUSES: TodoStatus[] = ['backlog', 'todo', 'in-progress', 'done']
 
-function isValidTodo(item: unknown): item is Todo {
+export function isValidTodo(item: unknown): item is Todo {
   if (typeof item !== 'object' || item === null) return false
   const t = item as Record<string, unknown>
   if (
