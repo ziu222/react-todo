@@ -74,3 +74,17 @@
   border: 1.5px dashed var(--border-color);
   border-radius: var(--radius-md);
 }
+
+/* ── Mobile: expand add-button touch target to 44px ── */
+@media (max-width: 768px) {
+  .kanban-column-add-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    margin: -8px -8px -8px 0;
+  }
+  .kanban-column-add-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+}
