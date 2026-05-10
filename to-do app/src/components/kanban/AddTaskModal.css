@@ -110,7 +110,9 @@
 .modal-input::placeholder { color: var(--text-muted); }
 .modal-input:focus        { border-color: var(--accent-light); outline: none; }
 
-.modal-select { cursor: pointer; appearance: auto; }
+.modal-select { cursor: pointer; appearance: auto; color-scheme: light; }
+
+[data-theme-mode='dark'] .modal-select { color-scheme: dark; }
 
 /* ── Tags ── */
 .tag-row {
