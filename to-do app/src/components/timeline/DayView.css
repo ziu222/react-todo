@@ -468,6 +468,9 @@
   transition: width 0.4s ease;
 }
 
+/* ── Emoji ── */
+.dv-emoji { margin-right: 5px; font-size: 0.95rem; }
+
 /* ── Responsive ── */
 @media (max-width: 960px) {
   .dv-panel {
