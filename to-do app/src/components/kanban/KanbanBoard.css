@@ -19,11 +19,47 @@
     gap: 16px;
     padding-bottom: 12px;
     -webkit-overflow-scrolling: touch;
+    scroll-padding-left: 16px;
+    scrollbar-width: none;
+  }
+
+  .kanban-board::-webkit-scrollbar {
+    display: none;
   }
 
   .kanban-board .kanban-column {
     scroll-snap-align: start;
     min-width: 82vw;
     flex-shrink: 0;
+  }
+
+  .kanban-board::after {
+    content: '';
+    display: block;
+    min-width: 1px;
+    flex-shrink: 0;
+  }
+}
+
+/* ── Column indicator dots (mobile only) ── */
+.kanban-dots { display: none; }
+
+@media (max-width: 768px) {
+  .kanban-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 0 4px;
+  }
+  .kanban-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border-color);
+    transition: background var(--transition-fast), transform var(--transition-fast);
+  }
+  .kanban-dot.active {
+    background: var(--accent);
+    transform: scale(1.4);
   }
 }
