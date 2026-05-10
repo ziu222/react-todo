@@ -126,13 +126,39 @@
 @media (max-width: 768px) {
   .topbar {
     padding: 0 16px;
+    gap: 10px;
   }
 
   .topbar-title {
-    display: none;
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 700;
+    max-width: 80px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 0;
+    min-width: 0;
   }
 
   .topbar-search {
     max-width: none;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .topbar-icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .topbar-avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 0.85rem;
+  }
+
+  .topbar-actions {
+    gap: 4px;
   }
 }

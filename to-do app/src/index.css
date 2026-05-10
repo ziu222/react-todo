@@ -94,3 +94,16 @@ mark.highlight {
   white-space: nowrap;
   border-width: 0;
 }
+
+/* ── Mobile: bottom-sheet slide-up animation ── */
+@keyframes sheet-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@media (max-width: 640px) {
+  .td-modal,
+  .modal {
+    animation: sheet-up 220ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+}

@@ -33,3 +33,13 @@
     grid-column: 1 / -1;
   }
 }
+
+@media (max-width: 360px) {
+  .stat-row {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-row > :last-child {
+    grid-column: auto;
+  }
+}

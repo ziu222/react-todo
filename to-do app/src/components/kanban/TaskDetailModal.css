@@ -259,3 +259,17 @@
 .td-action-btn.active       { color: var(--accent); border-color: var(--accent-light); }
 .td-action-btn.advance      { margin-left: auto; }
 .td-action-btn.delete:hover { background: rgba(239,68,68,0.08); color: #EF4444; border-color: rgba(239,68,68,0.3); }
+
+/* ── Mobile: full-screen bottom sheet ── */
+@media (max-width: 640px) {
+  .td-backdrop {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .td-modal {
+    width: 100vw;
+    max-width: 100vw;
+    max-height: 92dvh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+}
