@@ -3,7 +3,8 @@ import type { Todo, TodoStatus, Priority, Attachment } from '../../features/todo
 import { calcProgressPreview } from '../../features/todos/model/todoLogic'
 import './AddTaskModal.css'
 
-const PRESET_TAGS = ['Planning', 'Research', 'Content', 'Development', 'Design', 'Marketing']
+const PRESET_TAGS   = ['Planning', 'Research', 'Content', 'Development', 'Design', 'Marketing']
+const QUICK_EMOJIS  = ['🔥', '⭐', '✅', '📌', '🚀', '💡', '🐛', '⚠️', '🎯', '📝']
 
 const PRIORITY_OPTIONS: { value: Priority; label: string }[] = [
   { value: 'low',    label: 'Low Priority'    },
@@ -24,6 +25,7 @@ interface AddTaskModalProps {
   onSubmit: (data: {
     title:        string
     status:       TodoStatus
+    emoji?:       string
     startDay?:    number
     endDay?:      number
     priority?:    Priority
@@ -33,6 +35,7 @@ interface AddTaskModalProps {
   }) => void
   onUpdate?: (updates: {
     title:        string
+    emoji?:       string
     startDay?:    number
     endDay?:      number
     priority?:    Priority
@@ -90,6 +93,7 @@ export default function AddTaskModal({ initialStatus, initialTodo, onClose, onSu
   const isEditing = !!initialTodo
 
   const [title,       setTitle]       = useState(initialTodo?.title ?? '')
+  const [emoji,       setEmoji]       = useState(initialTodo?.emoji ?? '')
   const [startDay,    setStartDay]    = useState(initialTodo?.startDay ? msToDateStr(initialTodo.startDay) : '')
   const [endDay,      setEndDay]      = useState(initialTodo?.endDay   ? msToDateStr(initialTodo.endDay)   : '')
   const [priority,    setPriority]    = useState<Priority>(initialTodo?.priority ?? 'medium')
@@ -104,6 +108,7 @@ export default function AddTaskModal({ initialStatus, initialTodo, onClose, onSu
   useEffect(() => {
     if (!initialTodo) return
     setTitle(initialTodo.title)
+    setEmoji(initialTodo.emoji ?? '')
     setStartDay(initialTodo.startDay ? msToDateStr(initialTodo.startDay) : '')
     setEndDay(initialTodo.endDay     ? msToDateStr(initialTodo.endDay)   : '')
     setPriority(initialTodo.priority ?? 'medium')
@@ -156,10 +161,11 @@ export default function AddTaskModal({ initialStatus, initialTodo, onClose, onSu
       description: description.trim() || undefined,
       attachments: attachments.length ? attachments : undefined,
     }
+    const emojiVal = emoji.trim() || undefined
     if (isEditing && onUpdate) {
-      onUpdate(payload)
+      onUpdate({ ...payload, emoji: emojiVal })
     } else {
-      onSubmit({ ...payload, status: initialStatus })
+      onSubmit({ ...payload, emoji: emojiVal, status: initialStatus })
     }
     onClose()
   }
@@ -193,6 +199,32 @@ export default function AddTaskModal({ initialStatus, initialTodo, onClose, onSu
                     required
                   />
                 </label>
+
+                <div className="modal-field-label">
+                  EMOJI
+                  <div className="emoji-picker-row">
+                    {QUICK_EMOJIS.map(e => (
+                      <button
+                        key={e}
+                        type="button"
+                        className={`emoji-quick-btn${emoji === e ? ' active' : ''}`}
+                        onClick={() => setEmoji(prev => prev === e ? '' : e)}
+                        aria-label={`Pick emoji ${e}`}
+                      >
+                        {e}
+                      </button>
+                    ))}
+                    <input
+                      className="emoji-custom-input"
+                      type="text"
+                      placeholder="✏️"
+                      value={emoji}
+                      onChange={e => setEmoji(e.target.value.slice(-2))}
+                      maxLength={2}
+                      aria-label="Custom emoji"
+                    />
+                  </div>
+                </div>
 
                 <div className="modal-row">
                   <label className="modal-field-label">
