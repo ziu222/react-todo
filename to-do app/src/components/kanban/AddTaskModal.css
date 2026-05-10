@@ -9,7 +9,7 @@
   justify-content: center;
   z-index: 200;
   padding: 20px;
-  animation: fade-in 180ms ease both;
+  animation: fade-in 250ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* ── Modal shell ── */
@@ -23,7 +23,7 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  animation: scale-in 220ms cubic-bezier(0.34, 1.20, 0.64, 1) both;
+  animation: scale-in 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* ── Header ── */
@@ -97,7 +97,7 @@
   font-size: 0.6rem;
   font-weight: 700;
   border-radius: 8px;
-  animation: pop-in 200ms ease both;
+  animation: pop-in 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* ── Tab content ── */
@@ -105,7 +105,7 @@
 
 .modal-tab-content {
   padding-top: 16px;
-  animation: slide-up-fade 200ms ease both;
+  animation: slide-up-fade 350ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* ── Cards ── */
@@ -202,7 +202,7 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   z-index: 50;
   overflow: hidden;
-  animation: scale-in 150ms ease both;
+  animation: scale-in 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
   transform-origin: top center;
 }
 
