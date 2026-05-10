@@ -8,7 +8,12 @@
   flex-direction: column;
   gap: 12px;
   transition: background var(--transition-normal), box-shadow var(--transition-fast);
+  animation: slide-up-fade 300ms ease both;
 }
+
+.stat-row > :nth-child(2) .stat-card { animation-delay: 60ms; }
+.stat-row > :nth-child(3) .stat-card { animation-delay: 120ms; }
+.stat-row > :nth-child(4) .stat-card { animation-delay: 180ms; }
 
 .stat-card:hover {
   background: var(--bg-card-hover);
