@@ -1,10 +1,12 @@
 import { createBrowserRouter } from 'react-router-dom'
-import Layout       from './Layout'
+import Layout        from './Layout'
 import DashboardPage from '../pages/DashboardPage'
 import TimelinePage  from '../pages/TimelinePage'
 import TasksPage     from '../pages/TasksPage'
 import SettingsPage  from '../pages/SettingsPage'
-// ── Router configuration
+import AboutPage     from '../pages/AboutPage'
+import ContactPage   from '../pages/ContactPage'
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -14,6 +16,8 @@ export const router = createBrowserRouter([
       { path: 'timeline', element: <TimelinePage />  },
       { path: 'tasks',    element: <TasksPage />     },
       { path: 'settings', element: <SettingsPage />  },
+      { path: 'about',    element: <AboutPage />     },
+      { path: 'contact',  element: <ContactPage />   },
     ],
   },
 ])
