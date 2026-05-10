@@ -58,11 +58,31 @@ function IconSun() {
   )
 }
 
+function IconInfo() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
+    </svg>
+  )
+}
+
+function IconContact() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+    </svg>
+  )
+}
+
 const NAV_LINKS = [
   { to: '/',         label: 'Dashboard', Icon: IconDashboard },
   { to: '/timeline', label: 'Timeline',  Icon: IconTimeline  },
   { to: '/tasks',    label: 'Tasks',     Icon: IconTasks     },
   { to: '/settings', label: 'Settings',  Icon: IconSettings  },
+  { to: '/about',    label: 'About',     Icon: IconInfo      },
+  { to: '/contact',  label: 'Contact',   Icon: IconContact   },
 ]
 
 export default function Sidebar() {
