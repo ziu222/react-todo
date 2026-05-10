@@ -11,7 +11,14 @@
   transition: background var(--transition-fast), box-shadow var(--transition-fast);
   cursor: default;
   overflow: hidden;
+  animation: slide-up-fade 240ms ease both;
 }
+
+.kanban-column-list li:nth-child(2) .kc-card { animation-delay: 40ms; }
+.kanban-column-list li:nth-child(3) .kc-card { animation-delay: 80ms; }
+.kanban-column-list li:nth-child(4) .kc-card { animation-delay: 120ms; }
+.kanban-column-list li:nth-child(5) .kc-card { animation-delay: 160ms; }
+.kanban-column-list li:nth-child(n+6) .kc-card { animation-delay: 200ms; }
 
 .kc-card:hover {
   background: var(--bg-card-hover);
