@@ -3,10 +3,13 @@
 ## Product summary
 **React To‑Do App** is a lightweight task manager with a dashboard-first experience:
 - **Dashboard**: KPI cards (Total / In Progress / Completed), progress chart (Daily/Weekly/Monthly), and a **Today** panel with quick-add.
-- **Tasks**: CRUD, completion tracking, filters, and (later) Kanban-style organization.
+- **Tasks**: Kanban CRUD, completion tracking, search, pinning, and status transitions.
+- **Timeline**: Month/week task spans for date-based planning.
+- **Settings**: Persistent profile and theme controls.
+- **About / Contact**: Supporting informational pages.
 
 ## Status at a glance
-- **Current phase**: Core app complete — Kanban board, Timeline, Settings, and theme system all shipped. Next focus is polish, accessibility hardening, and deploy.
+- **Current phase**: Core app complete — dashboard, Kanban board, timeline, settings, and theme system are all shipped. Next focus is polish, accessibility hardening, tests, and deploy.
 - **Definition of Done (global)**:
   - No console errors in dev
   - All user input is validated (trim, non-empty, max length)
@@ -73,6 +76,7 @@
 - Progress bar derived from start/end dates — never stored as redundant state
 - Search bar filters across all columns simultaneously
 - Full localStorage persistence (`todos:v1`)
+- About and Contact routes wired into the app shell
 
 ---
 

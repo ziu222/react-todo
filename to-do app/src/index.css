@@ -122,6 +122,20 @@ mark.highlight {
   100% { opacity: 1; transform: scale(1); }
 }
 
+@keyframes page-out {
+  to { opacity: 0; transform: translateY(-10px) scale(0.99); }
+}
+
+/* ── View Transitions (Chrome / Safari) ── */
+@supports (view-transition-name: none) {
+  ::view-transition-old(root) {
+    animation: page-out 160ms cubic-bezier(0.4, 0, 1, 1) both;
+  }
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
 /* ── Button press micro-feedback ── */
 button:not(:disabled):active { transform: scale(0.95); }
 

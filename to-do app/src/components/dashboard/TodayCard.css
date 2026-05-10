@@ -11,8 +11,8 @@
   flex-direction: column;
   gap: 8px;
   cursor: pointer;
-  transition: box-shadow 0.15s, transform 0.15s, background var(--transition-fast);
-  animation: slide-up-fade 240ms ease both;
+  transition: box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background var(--transition-fast);
+  animation: slide-up-fade 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .today-list li:nth-child(2) .tc-card { animation-delay: 50ms; }
@@ -23,8 +23,8 @@
 
 .tc-card:hover {
   background: var(--bg-card-hover);
-  box-shadow: var(--card-shadow), 0 4px 16px rgba(0, 0, 0, 0.08);
-  transform: translateY(-1px);
+  box-shadow: var(--card-shadow), 0 6px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
 }
 
 .tc-card:focus-visible {
@@ -122,7 +122,7 @@
 .tc-progress-fill {
   height: 100%;
   border-radius: 2px;
-  transition: width 0.4s ease;
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ── Hover actions ── */
@@ -130,11 +130,12 @@
   display: flex;
   gap: 4px;
   opacity: 0;
-  transition: opacity 0.15s;
+  transform: translateY(5px);
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   justify-content: flex-end;
 }
 
-.tc-card:hover .tc-actions { opacity: 1; }
+.tc-card:hover .tc-actions { opacity: 1; transform: none; }
 
 .tc-btn {
   display: inline-flex;

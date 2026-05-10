@@ -1,81 +1,75 @@
 
 # React To-Do App
 
-A task management web app built with React 19 and Vite. Features a dashboard overview, Kanban board, Gantt-style timeline, and a multi-theme settings panel — all persisted to localStorage.
+A dashboard-first task management app built with React 19 and Vite. The app combines a KPI dashboard, Kanban board, timeline view, settings, and simple marketing pages, with state persisted in localStorage.
 
 ## Tech Stack
 
-- **React 19** + **Vite 8**
-- **TypeScript**
-- **React Router DOM v7**
+- React 19 + Vite 8
+- TypeScript
+- React Router DOM v7
+- Recharts for dashboard charts
 - Plain CSS with CSS variables
 
-## Project Structure
-
-```
-src/
-  app/              # Providers (ThemeContext, TodosContext, UserContext, router)
-  features/todos/
-    api/            # localStorage storage adapter (todos:v1)
-    hooks/          # useTodos — useReducer + hydration/persistence
-    model/          # Todo type + pure logic functions
-    utils/          # helper utilities (e.g. highlight matching text)
-  components/
-    dashboard/      # StatCard, TaskChart, TodayPanel
-    kanban/         # KanbanBoard, KanbanColumn, KanbanCard, AddTaskModal, TaskDetailModal
-    layout/         # Sidebar, TopBar, BottomNav
-    settings/       # ProfileBanner, ThemeSelector
-    timeline/       # TimelineHeader, TimelineRow
-  pages/            # DashboardPage, TasksPage, TimelinePage, SettingsPage
-  styles/           # themeFactory — CSS variable token sets
-```
-
-## Getting Started
+## Quick Start
 
 ```bash
 npm install
-npm run dev       # dev server at http://localhost:5173
-npm run build     # production build → dist/
-npm run preview   # preview production build
-npm run lint      # ESLint
+npm run dev
+npm run build
+npm run preview
+npm run lint
 ```
 
-## Features
+## Scripts
 
-### Dashboard
-- KPI cards: Total Tasks / In Progress / Completed (derived in real-time)
-- Progress chart with Daily / Weekly / Monthly timeframe toggle
-- Today panel — shows tasks due today with quick-add
+- `npm run dev` starts the Vite dev server.
+- `npm run build` produces the production bundle.
+- `npm run preview` serves the built app locally.
+- `npm run lint` runs ESLint across the workspace.
 
-### Tasks (Kanban)
-- Four columns: **Backlog → To Do → In Progress → Done**
-- Add task with title, color, priority, tags, start/end dates, description, and file attachments
-- Task detail modal for full editing
-- Pin tasks to float them to the top of their column
-- Delete tasks; auto-status for past end dates
-- Progress bar derived from start/end dates (not stored)
-- Global search filters all columns simultaneously
+## App Surface
 
-### Timeline
-- Gantt-style month/week view of tasks with `startDay`/`endDay` set
-- Navigate with Previous / Next / Today buttons
-- Color-coded task bars matching each task's accent color
+### Routes
+- `/` dashboard with KPI cards, chart, and Today panel
+- `/tasks` Kanban board for task management
+- `/timeline` month/week timeline view
+- `/settings` profile and theme controls
+- `/about` informational page
+- `/contact` contact page
 
-### Settings
-- Profile: first name, last name, email, cover color — persisted to localStorage
-- Theme selector with multiple built-in themes (CSS variable token sets)
+### Core capabilities
+- Task CRUD in the Kanban flow
+- Search and filter driven from shared app state
+- Timeline visualization for tasks with date ranges
+- Persistent theme and profile settings
+- Responsive layout with sidebar, top bar, and bottom navigation
 
-### Cross-cutting
-- All state persisted to `localStorage` (`todos:v1`, `todo:theme`, `todo:user`)
-- IDs use `crypto.randomUUID()` — never array indices
-- XSS-safe: titles rendered as plain React text nodes
-- Keyboard accessible (Enter to submit, focus-visible styles)
+## Architecture
+
+```
+src/
+  app/            # router and app-level providers
+  components/     # dashboard, kanban, layout, settings, timeline
+  pages/          # route-level pages
+  styles/         # theme tokens and factory helpers
+  features/todos/ # todo state, reducer logic, storage helpers
+```
+
+## State and Persistence
+
+- Todos use a versioned localStorage key: `todos:v1`
+- Theme is stored under `todo:theme`
+- User profile is stored under `todo:user`
+- IDs are generated with `crypto.randomUUID()`
+- Titles are trimmed and rendered as plain text
+- Storage reads are guarded with safe parsing and fallback values
+
+## Design Notes
+
+The UI draws from a task-management dashboard concept, with the implementation tuned for a practical app rather than a static mockup.
 
 ## References
 
--(FE at first) [django-react-todo-app](https://github.com/TuanTran0168/django-react-todo-app.git) by TuanTran0168
-- [TodoApp](https://github.com/maciekt07/TodoApp) by maciekt07
-
-## Design
-
-UI layout and assets inspired by the [Task Management Web App Design](https://www.figma.com/design/Oa55NERwMPgGQYJ9uhf3EU/Task--Management--Web-App-Design--Community-?node-id=2-384&t=1HVrXOKfyFEqZsYC-0) (Community) on Figma.
+- [docs/TODO_APP_PLAN.md](docs/TODO_APP_PLAN.md) for the current app architecture and state model
+- [docs/project-milestone.md](docs/project-milestone.md) for delivery status and roadmap
