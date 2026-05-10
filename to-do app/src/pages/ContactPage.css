@@ -1,7 +1,7 @@
 /* ── Page enter ── */
 .contact-page {
   max-width: 680px;
-  animation: slide-up-fade 280ms ease both;
+  animation: slide-up-fade 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* ── Hero ── */
@@ -64,8 +64,8 @@
   border-radius: var(--radius-md);
   text-decoration: none;
   box-shadow: var(--card-shadow);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background var(--transition-fast);
-  animation: slide-up-fade 300ms ease both;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1), background var(--transition-fast);
+  animation: slide-up-fade 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .ct-link-card:nth-child(2) { animation-delay: 80ms; }
@@ -129,10 +129,10 @@
   font-size: 1.3rem;
   color: var(--text-muted);
   flex-shrink: 0;
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
 }
 .ct-link-card:hover .ct-link-arrow {
-  transform: translateX(4px);
+  transform: translateX(6px);
   color: var(--ct-color, var(--accent));
 }
 

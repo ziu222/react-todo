@@ -1,7 +1,7 @@
 /* ── Page enter ── */
 .about-page {
   max-width: 860px;
-  animation: slide-up-fade 280ms ease both;
+  animation: slide-up-fade 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* ── Hero ── */
@@ -77,8 +77,8 @@
 /* ── Scroll-reveal ── */
 .reveal-block {
   opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.65s ease, transform 0.65s ease;
+  transform: translateY(32px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .reveal-block.visible {
@@ -113,8 +113,8 @@
   flex-direction: column;
   gap: 8px;
   box-shadow: var(--card-shadow);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background var(--transition-fast);
-  animation: slide-up-fade 400ms ease both;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), background var(--transition-fast);
+  animation: slide-up-fade 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .ab-feature-card:hover {
@@ -123,11 +123,11 @@
   box-shadow: var(--card-shadow), 0 8px 28px rgba(0, 0, 0, 0.1);
 }
 
-.ab-feature-card:nth-child(2) { animation-delay: 80ms; }
-.ab-feature-card:nth-child(3) { animation-delay: 160ms; }
-.ab-feature-card:nth-child(4) { animation-delay: 240ms; }
-.ab-feature-card:nth-child(5) { animation-delay: 320ms; }
-.ab-feature-card:nth-child(6) { animation-delay: 400ms; }
+.ab-feature-card:nth-child(2) { animation-delay: 60ms; }
+.ab-feature-card:nth-child(3) { animation-delay: 120ms; }
+.ab-feature-card:nth-child(4) { animation-delay: 180ms; }
+.ab-feature-card:nth-child(5) { animation-delay: 240ms; }
+.ab-feature-card:nth-child(6) { animation-delay: 300ms; }
 
 .ab-feature-icon  { font-size: 1.7rem; line-height: 1; }
 .ab-feature-title { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); }
@@ -144,7 +144,7 @@
   align-items: center;
   gap: 20px;
   box-shadow: var(--card-shadow);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .ab-dev-card:hover {
@@ -194,7 +194,7 @@
   font-size: 0.8rem;
   font-weight: 600;
   border: 1px solid var(--accent-light);
-  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: default;
 }
 
