@@ -1,156 +1,172 @@
-# Milestones & Delivery Plan
+# Milestones & Delivery History
 
-## Product summary
-**React To‑Do App** is a lightweight task manager with a dashboard-first experience:
-- **Dashboard**: KPI cards (Total / In Progress / Completed), progress chart (Daily/Weekly/Monthly), and a **Today** panel with quick-add.
-- **Tasks**: Kanban CRUD, completion tracking, search, pinning, and status transitions.
-- **Timeline**: Month/week task spans for date-based planning.
-- **Settings**: Persistent profile and theme controls.
-- **About / Contact**: Supporting informational pages.
+## Product Summary
 
-## Status at a glance
-- **Current phase**: Core app complete — dashboard, Kanban board, timeline, settings, and theme system are all shipped. Next focus is polish, accessibility hardening, tests, and deploy.
-- **Definition of Done (global)**:
-  - No console errors in dev
-  - All user input is validated (trim, non-empty, max length)
-  - Keyboard-accessible interactions (`:focus-visible`, labels, Enter/Escape flows)
-  - Persistence works reliably (localStorage with safe parsing and fallbacks)
+**TaskFlow** is a React 19 task manager with a dashboard-first experience:
+
+- **Dashboard** — 5 KPI stat cards (with animated SVG rings), Recharts progress chart, 15-week completion heatmap, Today panel.
+- **Tasks** — Kanban board with drag-and-drop, tag filtering, bulk actions, pinned sections, inline quick-edit, subtask checklist.
+- **Timeline** — Month/week Gantt view with smart 3-tier pill rendering.
+- **Settings** — Persistent profile (name, avatar, cover color) and multi-theme support.
+- **About / Contact** — Animated marketing pages.
+
+## Status at a Glance
+
+**Current phase**: Feature-complete. All planned features shipped. Next focus: unit tests, accessibility hardening, production deploy.
+
+**Definition of Done (global)**:
+- No console errors in dev
+- All user input validated (trim, non-empty, max length)
+- Keyboard-accessible (`:focus-visible`, labels, Enter/Escape)
+- Persistence reliable (localStorage with safe parsing and fallbacks)
 
 ---
 
-## Milestone 1 — Project bootstrap (Completed)
-**When**: 2026‑05‑05  
-**Outcome**: Working dev setup and repo hygiene.
+## Milestone 1 — Project Bootstrap ✅
+**Completed**: 2026-05-05
 
-**Delivered**
-- Vite + React project scaffold
-- ESLint (flat config)
+- Vite + React 19 scaffold
+- ESLint flat config
 - Git setup and base documentation
 - `vite-env.d.ts` for asset/editor typings
 
 ---
 
-## Milestone 2 — Core architecture (Completed)
-**When**: 2026‑05‑05 → 2026‑05‑06  
-**Outcome**: Stable foundations for state and persistence.
+## Milestone 2 — Core Architecture ✅
+**Completed**: 2026-05-05 → 2026-05-06
 
-**Delivered**
-- `Todo` model (id, title, completed, createdAt)
-- Pure logic functions (add/toggle/delete/clear) in `features/todos/model/`
-- `useTodos` hook (reducer + hydration/persistence)
-- localStorage adapter (versioned key: `todos:v1`)
-- App-level providers (theme + todos)
+- `Todo` model with `id`, `title`, `completed`, `createdAt`
+- Pure logic functions in `features/todos/model/`
+- `useTodos` hook (reducer + hydration + localStorage persistence)
+- Versioned storage adapter (`todos:v1`)
+- App-level providers: theme + todos
 
 ---
 
-## Milestone 3 — Dashboard shell & layout (Completed)
-**When**: 2026‑05‑06  
-**Outcome**: Dashboard matches the intended first screen (sidebar, header, cards, chart, today panel).
+## Milestone 3 — Dashboard Shell & Layout ✅
+**Completed**: 2026-05-06
 
-**Delivered**
-- Layout: sidebar navigation + top header with search/notifications/profile
+- Sidebar navigation + sticky top bar (search, notifications, avatar)
 - KPI cards: Total Tasks / In Progress / Completed
-- Progress chart with timeframe toggle (Daily / Weekly / Monthly)
-- Today panel with date, empty-state text, and “Add a task…” quick input
-- Page scaffolds (Dashboard / Tasks / Timeline / Settings)
-
-**Design reference**
-- Inspired by a Figma community dashboard concept (see existing link in repo history).
+- Recharts progress chart with Daily / Weekly / Monthly toggle
+- Today panel with date header, empty state, and quick-add input
+- Page scaffolds for all routes
 
 ---
 
-## Milestone 4 — Task functionality (Completed)
-**When**: 2026‑05‑06 → 2026‑05‑07  
-**Outcome**: Full Kanban-based task management wired to real state and localStorage.
+## Milestone 4 — Task Functionality ✅
+**Completed**: 2026-05-06 → 2026-05-07
 
-**Delivered**
-- Kanban board with four columns: **Backlog / To Do / In Progress / Done**
-- Add task via per-column inline form (title, color picker, start/end date, priority, tags, description, attachments)
-- Task detail modal — full-field view with edit support
-- Update status (drag-free column reassignment via modal)
-- Delete task
-- Pin task (pinned items float to top within their column)
-- Derived KPI counts on Dashboard (Total / In Progress / Completed) update in real time
-- Today panel on Dashboard shows tasks due today with quick-add
-- Auto-status: tasks whose end date has already passed are created as **Done**
-- Progress bar derived from start/end dates — never stored as redundant state
-- Search bar filters across all columns simultaneously
-- Full localStorage persistence (`todos:v1`)
-- About and Contact routes wired into the app shell
+- Kanban board: Backlog / To Do / In Progress / Done columns
+- Tabbed add-task modal: Details · Organize · Files · Notes
+- Fields: title, emoji picker, start/end date, priority, tags, description, color, file attachments
+- Task detail modal with all fields in read-only view
+- Update status, delete task, pin task (floats to top of column)
+- Auto-status: tasks past their end date created as Done
+- Progress bar derived from `startDay`/`endDay` — never stored
+- Subtasks with start/end time slots
+- Search across all columns; counts update live on Dashboard
+- Today panel shows tasks due today
 
 ---
 
-## Milestone 5 — Timeline view (Completed)
-**When**: 2026‑05‑07  
-**Outcome**: Gantt-style timeline showing task date ranges across a month or week.
+## Milestone 5 — Timeline View ✅
+**Completed**: 2026-05-07
 
-**Delivered**
-- Timeline page with **Month / Week** view toggle
-- Previous / Next / Today navigation
-- Each task renders as a horizontal bar spanning its `startDay → endDay`
-- Tasks without dates are listed in a separate "No date" section
+- Month / Week toggle with Prev / Next / Today navigation
+- Each task renders as a horizontal bar spanning `startDay → endDay`
 - Color-coded bars match each task's accent color
-- View is read-only (task editing lives in the Kanban detail modal)
+- Tasks without dates shown in a separate section
+- Day click opens the DayView drill-down panel
 
 ---
 
-## Milestone 6 — Settings & theme system (Completed)
-**When**: 2026‑05‑07  
-**Outcome**: Persistent user profile and multi-theme support.
+## Milestone 6 — Settings & Theme System ✅
+**Completed**: 2026-05-07
 
-**Delivered**
-- Settings page with **My Details / Theme** tabs
-- Profile fields: first name, last name, email, cover color; persisted to localStorage
-- Profile banner shows avatar initials and cover color
-- Theme selector with multiple built-in themes (tokens applied via CSS variables)
-- Selected theme persisted to localStorage (`todo:theme`)
-- `UserContext` provider for profile state across the app
+- Settings page with My Details / Theme tabs
+- Profile: first name, last name, email, avatar upload, cover color
+- Multiple built-in themes applied via CSS custom properties
+- `UserContext` persists profile to `todo:user`; theme to `todo:theme`
 
 ---
 
-## Milestone 7 — Filters, editing, and UX polish (Planned)
-**Goal**: Everyday usability features without adding complex infrastructure.
+## Milestone 7 — UX Polish & New Features ✅
+**Completed**: 2026-05-08 → 2026-05-09
+
+All originally planned features plus additional improvements:
+
+- **Drag-and-drop** between Kanban columns (HTML5 native)
+- **Tag filter bar** — horizontal pill row filters the entire board
+- **Bulk action bar** — multi-select cards, move all or delete all
+- **Pinned tasks section** — dedicated header row above normal cards in each column
+- **Empty column states** — per-column emoji + message + hint
+- **Empty board state** — full-board banner with "Load sample tasks" button (7 realistic demo tasks across all statuses)
+- **Inline title quick-edit** — double-click any card title; Enter saves, Escape cancels
+- **Description preview** on cards — 1-line clamp below the title
+- **Subtask count** on cards — `✓ 2/4` meta badge
+- **Subtask checklist** in task detail modal — click to toggle done/undone
+- **Column color themes** — tinted header backgrounds via `color-mix()`
+- **Due Today** and **Overdue** stat cards on Dashboard
+- **Debounced search** (200 ms) in TopBar
+
+---
+
+## Milestone 8 — Animations & Motion ✅
+**Completed**: 2026-05-09 → 2026-05-10
+
+- **Page transitions** via View Transitions API (`viewTransition` on NavLink, `key={pathname}` remount)
+- **Scroll-reveal** on About and Contact pages (IntersectionObserver, transition-based)
+- **Expo-out easing** (`cubic-bezier(0.16, 1, 0.3, 1)`) applied app-wide
+- **Card hover lift** on Kanban cards (`translateY(-2px)` + shadow)
+- **Action slide-in** — card action buttons animate up on hover
+- **Sidebar micro-animations** — logo spin, nav icon scale, active indicator height animation
+- **Progress bar fill** transition on cards
+
+---
+
+## Milestone 9 — Dashboard Enhancements ✅
+**Completed**: 2026-05-10 → 2026-05-11
+
+- **15-week completion heatmap** — GitHub-style activity grid using `endDay ?? createdAt` for done tasks
+- **Animated SVG progress rings** on In Progress and Completed stat cards — `stroke-dashoffset` animation from 0 to value on mount
+
+---
+
+## Milestone 10 — Keyboard Shortcuts & Global UX ✅
+**Completed**: 2026-05-11
+
+- **Keyboard shortcuts**: `N` new task (any page), `/` focus search, `?` cheat-sheet overlay, `Esc` close modal
+- **Global add-task modal** in Layout — `N` key opens `AddTaskModal` from any route without navigation
+- **TopBar + New button** and **keyboard icon button** for discoverability
+- **`/` hint badge** inside search input (fades on focus)
+- **ShortcutOverlay** component with styled `<kbd>` elements
+
+---
+
+## Milestone 11 — Timeline & Date Pill Fixes ✅
+**Completed**: 2026-05-11
+
+- **3-tier timeline pills**: 1-day → compact colored circle with emoji; 2-day → title-only capsule; 3+ days → full pill with progress + arrow. Eliminates the "donut" artifact from fixed-size fill in a circle pill.
+- **Smart Kanban date pills**: single "Due: Today" pill for same-day tasks; amber "Today" highlight when due date is today; `endDay`-only tasks now show "Due: [date]" instead of hiding the date.
+- **Division-by-zero fix** in `calcProgress` for `startDay === endDay` tasks.
+- **React.memo** on `KanbanCard`, `StatCard`, `TodayCard` to prevent unnecessary re-renders.
+
+---
+
+## Milestone 12 — Tests, A11y & Deploy (Planned)
+
+**Goal**: Confidence to ship and iterate.
 
 **Scope**
-- Filter sidebar / chip bar: All / Backlog / To Do / In Progress / Done
-- Inline edit directly on Kanban cards (Enter to save, Escape to cancel)
-- Clear completed column in one click
-- Empty states that look intentional (not placeholder-ish)
-- Drag-and-drop card reordering between columns
+- Unit tests for `todoLogic.ts` pure functions (add, delete, calcProgress, selectCounts)
+- Storage adapter tests (parse failures, version mismatch)
+- Focus management after task delete (move focus to sibling or list container)
+- `aria-live="polite"` on filtered task count
+- Production build + Vercel / GitHub Pages deploy
+- README screenshots and live link
 
 **Acceptance criteria**
-- Filtered views match the underlying state (no duplicated derived state)
-- Inline edit never allows blank titles
-- Clear completed is one click
-
----
-
-## Milestone 8 — Accessibility & responsiveness (Planned)
-**Goal**: Keyboard-first and mobile-friendly experience.
-
-**Scope**
-- `:focus-visible` and consistent focus rings
-- Labels correctly bound (`htmlFor` / `aria-labelledby`)
-- Responsive layout (sidebar collapses on small screens, bottom-nav on mobile)
-- Theme toggle accessible from keyboard
-
-**Acceptance criteria**
-- Full task flow usable via keyboard only
-- No interactive element lacks an accessible name
-- Layout remains usable at common mobile widths (375px)
-
----
-
-## Milestone 9 — Testing & release (Planned)
-**Goal**: Confidence to iterate quickly and ship a stable build.
-
-**Scope**
-- Add unit tests for pure todo logic
-- Add smoke tests for key UI components (KPI cards, Today quick-add)
-- Production build + deploy (Vercel or GitHub Pages)
-- README updated with screenshots + live link
-
-**Acceptance criteria**
-- Tests run in CI locally (`npm test` or equivalent)
-- `npm run build` succeeds with no warnings that indicate runtime issues
-- Deployed app loads and persists tasks across reloads
+- `npm test` passes in CI
+- `npm run build` produces no warnings indicating runtime issues
+- Deployed app loads, persists tasks, and passes keyboard nav from add to delete
