@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import './StatCard.css'
 
 interface StatCardProps {
@@ -30,7 +31,7 @@ function ProgressRing({ pct, color }: { pct: number; color: string }) {
   )
 }
 
-export default function StatCard({ icon, label, count, trend, accentColor, total }: StatCardProps) {
+const StatCard = memo(function StatCard({ icon, label, count, trend, accentColor, total }: StatCardProps) {
   const isPositive = trend >= 0
   const pct = total != null && total > 0 ? Math.min(100, Math.round((count / total) * 100)) : null
 
@@ -51,4 +52,6 @@ export default function StatCard({ icon, label, count, trend, accentColor, total
       </span>
     </div>
   )
-}
+})
+
+export default StatCard

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, memo } from 'react'
 import type { Todo, TodoStatus, Priority } from '../../features/todos/model/todoLogic'
 import { calcProgress } from '../../features/todos/model/todoLogic'
 import { highlightMatchingText } from '../../features/todos/utils/highlightMatchingText'
@@ -118,7 +118,7 @@ const STATUS_ICON: Record<TodoStatus, React.ReactElement> = {
 const fmt = (ms: number) =>
   new Date(ms).toLocaleDateString('en', { month: 'short', day: 'numeric' })
 
-export default function KanbanCard({ todo, query, isSelected, onToggleSelect, onUpdateStatus, onUpdateTitle, onDelete, onEdit }: KanbanCardProps) {
+const KanbanCard = memo(function KanbanCard({ todo, query, isSelected, onToggleSelect, onUpdateStatus, onUpdateTitle, onDelete, onEdit }: KanbanCardProps) {
   const [detailOpen,    setDetailOpen]    = useState(false)
   const [editingTitle,  setEditingTitle]  = useState(false)
   const [titleDraft,    setTitleDraft]    = useState(todo.title)
@@ -301,4 +301,6 @@ export default function KanbanCard({ todo, query, isSelected, onToggleSelect, on
     )}
     </>
   )
-}
+})
+
+export default KanbanCard
