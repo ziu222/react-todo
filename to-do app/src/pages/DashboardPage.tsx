@@ -57,11 +57,11 @@ export default function DashboardPage() {
     <div className="dashboard">
       <div className="dashboard-main">
         <section className="stat-row" aria-label="Task statistics">
-          <StatCard icon={<IconList     />} label="Total Tasks"  count={counts.all}            trend={counts.all}            accentColor="var(--accent)"             />
-          <StatCard icon={<IconClock    />} label="In Progress"  count={counts['in-progress']} trend={counts['in-progress']} accentColor="var(--status-in-progress)" />
-          <StatCard icon={<IconCheck    />} label="Completed"    count={counts.done}           trend={counts.done}           accentColor="var(--status-done)"        />
-          <StatCard icon={<IconCalendar />} label="Due Today"    count={counts.dueToday}       trend={counts.dueToday}       accentColor="#F59E0B"                   />
-          <StatCard icon={<IconAlert    />} label="Overdue"      count={counts.overdue}        trend={-counts.overdue}       accentColor="#EF4444"                   />
+          <StatCard icon={<IconList     />} label="Total Tasks"  count={counts.all}            trend={counts.all}            accentColor="var(--accent)"                                                />
+          <StatCard icon={<IconClock    />} label="In Progress"  count={counts['in-progress']} trend={counts['in-progress']} accentColor="var(--status-in-progress)" total={counts.all} />
+          <StatCard icon={<IconCheck    />} label="Completed"    count={counts.done}           trend={counts.done}           accentColor="var(--status-done)"        total={counts.all} />
+          <StatCard icon={<IconCalendar />} label="Due Today"    count={counts.dueToday}       trend={counts.dueToday}       accentColor="#F59E0B"                                      />
+          <StatCard icon={<IconAlert    />} label="Overdue"      count={counts.overdue}        trend={-counts.overdue}       accentColor="#EF4444"                                      />
         </section>
 
         <TaskChart todos={filteredTodos} />
