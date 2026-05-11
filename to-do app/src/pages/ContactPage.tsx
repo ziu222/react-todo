@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import heroTheme from '../assets/heroTheme.png'
 import './ContactPage.css'
 
 // ── Scroll-reveal hook ─────────────────────────────────────────────────────
@@ -92,6 +93,7 @@ export default function ContactPage() {
         <div className="ct-hero-eyebrow">Get in Touch</div>
         <h1 className="ct-hero-title">LET'S<br />CONNECT</h1>
         <p className="ct-hero-sub">Reach out through any of the channels below</p>
+        <img src={heroTheme} alt="" className="ct-hero-img" aria-hidden="true" />
       </section>
 
       {/* ── Links ── */}
