@@ -37,7 +37,11 @@ export default function KanbanColumn({
   const [modalOpen, setModalOpen] = useState(false)
 
   return (
-    <section className="kanban-column" data-status={status}>
+    <section
+      className="kanban-column"
+      data-status={status}
+      style={{ '--col-color': accentColor } as React.CSSProperties}
+    >
       <header className="kanban-column-header">
         <div className="kanban-column-label">
           <span className="kanban-column-dot" style={{ background: accentColor }} />
@@ -57,7 +61,17 @@ export default function KanbanColumn({
 
       <ul className="kanban-column-list">
         {todos.length === 0 && (
-          <li className="kanban-column-empty">No tasks here</li>
+          <li className="kanban-column-empty">
+            <span className="kanban-column-empty-icon">
+              {status === 'backlog' ? '📋' : status === 'todo' ? '✅' : status === 'in-progress' ? '⚡' : '🎉'}
+            </span>
+            <span className="kanban-column-empty-text">
+              {status === 'backlog' ? 'No backlog items' : status === 'todo' ? "You're all caught up" : status === 'in-progress' ? 'Nothing in progress' : 'No completed tasks yet'}
+            </span>
+            <span className="kanban-column-empty-sub">
+              {status === 'done' ? 'Finish a task to see it here' : 'Hit + to add one'}
+            </span>
+          </li>
         )}
         {todos.map(todo => (
           <li key={todo.id}>

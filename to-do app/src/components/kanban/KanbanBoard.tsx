@@ -17,7 +17,11 @@ export default function KanbanBoard() {
   const { filteredTodos, query, addTodo, updateStatus, deleteTodo, updateTask } = useTodosContext()
   const [editingTodo,  setEditingTodo]  = useState<Todo | null>(null)
   const [selectedIds,  setSelectedIds]  = useState<Set<string>>(new Set())
+  const [activeTag,    setActiveTag]    = useState<string | null>(null)
   const boardRef = useRef<HTMLDivElement>(null)
+
+  const allTags = Array.from(new Set(filteredTodos.flatMap(t => t.tags ?? []))).sort()
+  const visibleTodos = activeTag ? filteredTodos.filter(t => t.tags?.includes(activeTag)) : filteredTodos
 
   function toggleSelect(id: string) {
     setSelectedIds(prev => {
@@ -61,6 +65,26 @@ export default function KanbanBoard() {
 
   return (
     <>
+      {allTags.length > 0 && (
+        <div className="kanban-tag-filter">
+          <button
+            className={`kanban-tag-pill${activeTag === null ? ' active' : ''}`}
+            onClick={() => setActiveTag(null)}
+          >
+            All
+          </button>
+          {allTags.map(tag => (
+            <button
+              key={tag}
+              className={`kanban-tag-pill${activeTag === tag ? ' active' : ''}`}
+              onClick={() => setActiveTag(prev => prev === tag ? null : tag)}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="kanban-board" ref={boardRef}>
         {COLUMNS.map(col => (
           <KanbanColumn
@@ -68,7 +92,7 @@ export default function KanbanBoard() {
             status={col.status}
             label={col.label}
             accentColor={col.color}
-            todos={filteredTodos.filter(t => t.status === col.status)}
+            todos={visibleTodos.filter(t => t.status === col.status)}
             query={query}
             selectedIds={selectedIds}
             onToggleSelect={toggleSelect}
