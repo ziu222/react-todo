@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { Todo, TodoStatus, Priority, Attachment } from '../../features/todos/model/todoLogic'
 import KanbanCard from './KanbanCard'
 import AddTaskModal from './AddTaskModal'
+import emptyIllustration from '../../assets/heroTheme1.png'
 import './KanbanColumn.css'
 
 export interface AddTaskData {
@@ -107,9 +108,7 @@ export default function KanbanColumn({
       <ul className="kanban-column-list">
         {unpinned.length === 0 && pinned.length === 0 && (
           <li className="kanban-column-empty">
-            <span className="kanban-column-empty-icon">
-              {status === 'backlog' ? '📋' : status === 'todo' ? '✅' : status === 'in-progress' ? '⚡' : '🎉'}
-            </span>
+            <img src={emptyIllustration} alt="" className="kanban-column-empty-illustration" aria-hidden="true" />
             <span className="kanban-column-empty-text">
               {status === 'backlog' ? 'No backlog items' : status === 'todo' ? "You're all caught up" : status === 'in-progress' ? 'Nothing in progress' : 'No completed tasks yet'}
             </span>

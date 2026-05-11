@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { useThemeContext } from '../../app/ThemeContext'
+import logoImg from '../../assets/logo.png'
 import './Sidebar.css'
 
 function IconDashboard() {
@@ -98,7 +99,9 @@ export default function Sidebar() {
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-logo" aria-label="My Todos">T</div>
+      <div className="sidebar-logo" aria-label="My Todos">
+        <img src={logoImg} alt="My Todos" className="sidebar-logo-img" />
+      </div>
 
       <nav className="sidebar-nav" aria-label="Main navigation">
         {NAV_LINKS.map(({ to, label, Icon }) => (

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useUserContext } from '../app/UserContext'
+import heroImg from '../assets/heroImg.png'
 import './AboutPage.css'
 
 // ── Scroll-reveal hook ─────────────────────────────────────────────────────
@@ -52,6 +53,7 @@ export default function AboutPage() {
       <section className="ab-hero">
         <div className="ab-hero-eyebrow">Task Management React</div>
         <h1 className="ab-hero-title">FEATURE</h1>
+        <img src={heroImg} alt="" className="ab-hero-img" aria-hidden="true" />
       </section>
 
       {/* ── Features ── */}
