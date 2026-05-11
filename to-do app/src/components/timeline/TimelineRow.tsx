@@ -31,7 +31,24 @@ export default function TimelineRow({ todo, visibleDays, onOpenDetail, onDayClic
   const leftPct  = startIdx >= 0 ? (startIdx / n) * 100 : 0
   const widthPct = endIdx   >= 0 ? ((endIdx - (startIdx >= 0 ? startIdx : 0) + 1) / n) * 100 : (1 / n) * 100
 
-  const color = todo.color ?? '#8B5CF6'
+  // how many days this pill spans inside the visible window
+  const daySpan  = endIdx >= 0 && startIdx >= 0 ? endIdx - startIdx + 1 : 1
+
+  const color    = todo.color ?? '#8B5CF6'
+  const label    = todo.emoji ?? todo.title.trim()[0]?.toUpperCase() ?? '?'
+
+  const pillProps = {
+    style: {
+      left:  `${leftPct}%`,
+      width: `${widthPct}%`,
+      '--pill-color': color,
+    } as React.CSSProperties,
+    onClick:    (e: React.MouseEvent) => { e.stopPropagation(); onOpenDetail(todo) },
+    role:       'button' as const,
+    tabIndex:   0,
+    onKeyDown:  (e: React.KeyboardEvent) => e.key === 'Enter' && onOpenDetail(todo),
+    title:      `${todo.emoji ? todo.emoji + ' ' : ''}${todo.title} · ${progress}%`,
+  }
 
   return (
     <div className="tl-row">
@@ -57,35 +74,42 @@ export default function TimelineRow({ todo, visibleDays, onOpenDetail, onDayClic
         )
       })}
 
-      {/* pill */}
+      {/* pill — three render tiers based on day span */}
       {pillVisible && (
-        <div
-          className="tl-pill"
-          style={{
-            left: `${leftPct}%`,
-            width: `${widthPct}%`,
-            '--pill-color': color,
-          } as React.CSSProperties}
-          onClick={e => { e.stopPropagation(); onOpenDetail(todo) }}
-          role="button"
-          tabIndex={0}
-          onKeyDown={e => e.key === 'Enter' && onOpenDetail(todo)}
-          title={`${todo.emoji ? todo.emoji + ' ' : ''}${todo.title} · ${progress}%`}
-        >
-          <div className="tl-pill-bg" />
-          <div className="tl-pill-fill" style={{ width: `${progress}%` }} />
-          <div className="tl-pill-content">
-            <span className="tl-pill-dot" />
-            <span className="tl-pill-name">
+        daySpan <= 1 ? (
+          /* ── Compact dot (1 day) ── */
+          <div className="tl-pill tl-pill--dot" {...pillProps}>
+            <div className="tl-pill-bg" />
+            <span className="tl-pill-dot-label">{label}</span>
+          </div>
+        ) : daySpan <= 2 ? (
+          /* ── Narrow pill (2 days) — title only ── */
+          <div className="tl-pill tl-pill--narrow" {...pillProps}>
+            <div className="tl-pill-bg" />
+            <div className="tl-pill-fill" style={{ width: `${progress}%` }} />
+            <div className="tl-pill-content">
               {todo.emoji && <span className="tl-emoji">{todo.emoji}</span>}
-              {todo.title}
-            </span>
-            <div className="tl-pill-meta">
-              <span className="tl-pill-pct">{progress}%</span>
-              <span className="tl-pill-arrow">›</span>
+              <span className="tl-pill-name">{todo.title}</span>
             </div>
           </div>
-        </div>
+        ) : (
+          /* ── Full pill (3+ days) ── */
+          <div className="tl-pill" {...pillProps}>
+            <div className="tl-pill-bg" />
+            <div className="tl-pill-fill" style={{ width: `${progress}%` }} />
+            <div className="tl-pill-content">
+              <span className="tl-pill-dot" />
+              <span className="tl-pill-name">
+                {todo.emoji && <span className="tl-emoji">{todo.emoji}</span>}
+                {todo.title}
+              </span>
+              <div className="tl-pill-meta">
+                <span className="tl-pill-pct">{progress}%</span>
+                <span className="tl-pill-arrow">›</span>
+              </div>
+            </div>
+          </div>
+        )
       )}
     </div>
   )
