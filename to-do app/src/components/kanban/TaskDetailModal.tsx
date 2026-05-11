@@ -1,5 +1,6 @@
 import type { Todo, TodoStatus, Priority } from '../../features/todos/model/todoLogic'
 import { calcProgress } from '../../features/todos/model/todoLogic'
+import { useTodosContext } from '../../app/TodosContext'
 import './TaskDetailModal.css'
 
 interface TaskDetailModalProps {
@@ -89,6 +90,7 @@ function IconPaperclip() {
 }
 
 export default function TaskDetailModal({ todo, onClose, onUpdateStatus, onDelete, onEdit }: TaskDetailModalProps) {
+  const { updateSubTaskStatus } = useTodosContext()
   const todayMs    = new Date().setHours(0, 0, 0, 0)
   const progress   = (todo.startDay != null && todo.endDay != null) || (todo.subTasks && todo.subTasks.length > 0)
     ? calcProgress(todo)
@@ -199,6 +201,32 @@ export default function TaskDetailModal({ todo, onClose, onUpdateStatus, onDelet
             <div className="td-section">
               <span className="td-label">Description</span>
               <p className="td-description">{todo.description}</p>
+            </div>
+          )}
+
+          {/* Subtasks */}
+          {todo.subTasks && todo.subTasks.length > 0 && (
+            <div className="td-section">
+              <span className="td-label">
+                Subtasks ({todo.subTasks.filter(s => s.status === 'done').length}/{todo.subTasks.length})
+              </span>
+              <ul className="td-subtasks">
+                {todo.subTasks.map(sub => (
+                  <li
+                    key={sub.id}
+                    className={`td-subtask-item${sub.status === 'done' ? ' done' : ''}`}
+                    onClick={() => updateSubTaskStatus(todo.id, sub.id, sub.status === 'done' ? 'todo' : 'done')}
+                  >
+                    <span className="td-subtask-check">
+                      {sub.status === 'done' ? '✓' : ''}
+                    </span>
+                    <span className="td-subtask-title">{sub.title}</span>
+                    {sub.startTime && sub.endTime && (
+                      <span className="td-subtask-time">{sub.startTime}–{sub.endTime}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 
