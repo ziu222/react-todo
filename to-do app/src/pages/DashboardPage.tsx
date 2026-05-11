@@ -1,7 +1,8 @@
 import { useTodosContext } from '../app/TodosContext'
-import StatCard   from '../components/dashboard/StatCard'
-import TaskChart  from '../components/dashboard/TaskChart'
-import TodayPanel from '../components/dashboard/TodayPanel'
+import StatCard      from '../components/dashboard/StatCard'
+import TaskChart     from '../components/dashboard/TaskChart'
+import TodayPanel    from '../components/dashboard/TodayPanel'
+import HeatmapChart  from '../components/dashboard/HeatmapChart'
 import './DashboardPage.css'
 
 function IconCheck() {
@@ -64,6 +65,7 @@ export default function DashboardPage() {
         </section>
 
         <TaskChart todos={filteredTodos} />
+        <HeatmapChart todos={filteredTodos} />
       </div>
 
       <TodayPanel />
