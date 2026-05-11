@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useTodosContext } from '../../app/TodosContext'
 import { useUserContext } from '../../app/UserContext'
+import NotificationPanel from './NotificationPanel'
 import './TopBar.css'
 
 const PAGE_TITLES: Record<string, string> = {
@@ -47,9 +48,27 @@ function IconPlus() {
 
 export default function TopBar() {
   const location  = useLocation()
-  const { query, setSearch } = useTodosContext()
-  const { user, initials }   = useUserContext()
-  const [inputVal, setInputVal] = useState(query)
+  const { query, setSearch, todos } = useTodosContext()
+  const { user, initials }          = useUserContext()
+  const [inputVal,    setInputVal]    = useState(query)
+  const [showNotifs,  setShowNotifs]  = useState(false)
+
+  const todayMs    = useMemo(() => new Date().setHours(0, 0, 0, 0), [])
+  const tomorrowMs = todayMs + 86_400_000
+
+  const overdueTodos  = useMemo(
+    () => todos.filter(t => t.endDay != null && t.endDay < todayMs && t.status !== 'done'),
+    [todos, todayMs]
+  )
+  const dueTodayTodos = useMemo(
+    () => todos.filter(t => t.endDay != null && t.endDay >= todayMs && t.endDay < tomorrowMs && t.status !== 'done'),
+    [todos, todayMs, tomorrowMs]
+  )
+  const highPriorityTodos = useMemo(() => {
+    const urgentIds = new Set([...overdueTodos, ...dueTodayTodos].map(t => t.id))
+    return todos.filter(t => t.priority === 'high' && t.status !== 'done' && !urgentIds.has(t.id))
+  }, [todos, overdueTodos, dueTodayTodos])
+  const hasNotifs = overdueTodos.length > 0 || dueTodayTodos.length > 0 || highPriorityTodos.length > 0
 
   const title = PAGE_TITLES[location.pathname] ?? 'My Todos'
 
@@ -106,10 +125,24 @@ export default function TopBar() {
           <IconKeyboard />
         </button>
 
-        <button className="topbar-icon-btn" aria-label="Notifications">
-          <IconBell />
-          <span className="topbar-badge" aria-hidden="true" />
-        </button>
+        <div className="topbar-notif-wrap">
+          <button
+            className="topbar-icon-btn"
+            aria-label="Notifications"
+            onClick={() => setShowNotifs(v => !v)}
+          >
+            <IconBell />
+            {hasNotifs && <span className="topbar-badge" aria-hidden="true" />}
+          </button>
+          {showNotifs && (
+            <NotificationPanel
+              overdue={overdueTodos}
+              dueToday={dueTodayTodos}
+              highPriority={highPriorityTodos}
+              onClose={() => setShowNotifs(false)}
+            />
+          )}
+        </div>
 
         <div className="topbar-avatar" aria-label={`Avatar for ${user.firstName}`}>
           {user.avatar
