@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import type { Todo, TodoStatus, Priority } from '../../features/todos/model/todoLogic'
 import { calcProgress, STATUS_LABEL } from '../../features/todos/model/todoLogic'
 import TaskDetailModal from '../kanban/TaskDetailModal'
@@ -63,7 +63,7 @@ function IconTrash() {
   )
 }
 
-export default function TodayCard({ todo, onEdit, onUpdateStatus, onDelete }: TodayCardProps) {
+const TodayCard = memo(function TodayCard({ todo, onEdit, onUpdateStatus, onDelete }: TodayCardProps) {
   const [detailOpen, setDetailOpen] = useState(false)
 
   const color      = todo.color ?? '#8B5CF6'
@@ -169,4 +169,6 @@ export default function TodayCard({ todo, onEdit, onUpdateStatus, onDelete }: To
       )}
     </>
   )
-}
+})
+
+export default TodayCard

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect, memo } from 'react'
 import type { Todo, TodoStatus, Priority } from '../../features/todos/model/todoLogic'
 import { calcProgress } from '../../features/todos/model/todoLogic'
 import { highlightMatchingText } from '../../features/todos/utils/highlightMatchingText'
@@ -6,13 +6,14 @@ import TaskDetailModal from './TaskDetailModal'
 import './KanbanCard.css'
 
 interface KanbanCardProps {
-  todo:            Todo
-  query:           string
-  isSelected:      boolean
-  onToggleSelect:  (id: string) => void
-  onUpdateStatus:  (id: string, status: TodoStatus) => void
-  onDelete:        (id: string) => void
-  onEdit:          (todo: Todo) => void
+  todo:             Todo
+  query:            string
+  isSelected:       boolean
+  onToggleSelect:   (id: string) => void
+  onUpdateStatus:   (id: string, status: TodoStatus) => void
+  onUpdateTitle:    (id: string, title: string) => void
+  onDelete:         (id: string) => void
+  onEdit:           (todo: Todo) => void
 }
 
 const STATUS_NEXT: Partial<Record<TodoStatus, TodoStatus>> = {
@@ -117,9 +118,30 @@ const STATUS_ICON: Record<TodoStatus, React.ReactElement> = {
 const fmt = (ms: number) =>
   new Date(ms).toLocaleDateString('en', { month: 'short', day: 'numeric' })
 
-export default function KanbanCard({ todo, query, isSelected, onToggleSelect, onUpdateStatus, onDelete, onEdit }: KanbanCardProps) {
-  const [detailOpen, setDetailOpen] = useState(false)
+const KanbanCard = memo(function KanbanCard({ todo, query, isSelected, onToggleSelect, onUpdateStatus, onUpdateTitle, onDelete, onEdit }: KanbanCardProps) {
+  const [detailOpen,    setDetailOpen]    = useState(false)
+  const [editingTitle,  setEditingTitle]  = useState(false)
+  const [titleDraft,    setTitleDraft]    = useState(todo.title)
+  const titleInputRef = useRef<HTMLInputElement>(null)
   const nextStatus = STATUS_NEXT[todo.status]
+
+  useEffect(() => {
+    if (editingTitle) {
+      titleInputRef.current?.select()
+    }
+  }, [editingTitle])
+
+  function commitTitle() {
+    const trimmed = titleDraft.trim()
+    if (trimmed && trimmed !== todo.title) onUpdateTitle(todo.id, trimmed)
+    else setTitleDraft(todo.title)
+    setEditingTitle(false)
+  }
+
+  function handleTitleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter')  { e.preventDefault(); commitTitle() }
+    if (e.key === 'Escape') { setTitleDraft(todo.title); setEditingTitle(false) }
+  }
   const todayMs    = new Date().setHours(0, 0, 0, 0)
   const progress   = (todo.startDay != null && todo.endDay != null) || (todo.subTasks && todo.subTasks.length > 0)
     ? calcProgress(todo)
@@ -174,10 +196,28 @@ export default function KanbanCard({ todo, query, isSelected, onToggleSelect, on
 
       {/* ── Center: title + desc + tags ── */}
       <div className="kc-body">
-        <p className="kc-title">
-          {todo.emoji && <span className="kc-emoji">{todo.emoji}</span>}
-          {highlightMatchingText(todo.title, query)}
-        </p>
+        {editingTitle ? (
+          <input
+            ref={titleInputRef}
+            className="kc-title-input"
+            value={titleDraft}
+            onChange={e => setTitleDraft(e.target.value)}
+            onBlur={commitTitle}
+            onKeyDown={handleTitleKeyDown}
+            onClick={e => e.stopPropagation()}
+            aria-label="Edit title"
+            maxLength={500}
+          />
+        ) : (
+          <p
+            className="kc-title"
+            onDoubleClick={e => { e.stopPropagation(); setTitleDraft(todo.title); setEditingTitle(true) }}
+            title="Double-click to edit"
+          >
+            {todo.emoji && <span className="kc-emoji">{todo.emoji}</span>}
+            {highlightMatchingText(todo.title, query)}
+          </p>
+        )}
         {todo.description && (
           <p className="kc-desc">{todo.description}</p>
         )}
@@ -261,4 +301,6 @@ export default function KanbanCard({ todo, query, isSelected, onToggleSelect, on
     )}
     </>
   )
-}
+})
+
+export default KanbanCard

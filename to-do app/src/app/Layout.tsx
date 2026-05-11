@@ -1,18 +1,35 @@
 import { useState, useEffect } from 'react'
-import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { ThemeProvider } from './ThemeContext'
 import { TodosProvider } from './TodosContext'
+import { useTodosContext } from './TodosContext'
 import { UserProvider } from './UserContext'
 import Sidebar          from '../components/layout/Sidebar'
 import TopBar           from '../components/layout/TopBar'
 import BottomNav        from '../components/layout/BottomNav'
 import ShortcutOverlay  from '../components/layout/ShortcutOverlay'
+import AddTaskModal     from '../components/kanban/AddTaskModal'
+import type { AddTaskData } from '../components/kanban/KanbanColumn'
 import '../components/layout/ShortcutOverlay.css'
 import './Layout.css'
 
-function KeyboardShortcuts({ onShowHelp }: { onShowHelp: () => void }) {
-  const navigate = useNavigate()
+function GlobalAddModal({ onClose }: { onClose: () => void }) {
+  const { addTodo } = useTodosContext()
+  function handleSubmit(data: AddTaskData) {
+    const { title, ...extras } = data
+    addTodo(title, extras)
+    onClose()
+  }
+  return (
+    <AddTaskModal
+      initialStatus="todo"
+      onClose={onClose}
+      onSubmit={handleSubmit}
+    />
+  )
+}
 
+function GlobalShortcuts() {
   useEffect(() => {
     function handler(e: KeyboardEvent) {
       const tag = (e.target as HTMLElement).tagName
@@ -20,7 +37,7 @@ function KeyboardShortcuts({ onShowHelp }: { onShowHelp: () => void }) {
 
       if (e.key === '?' && !isEditing) {
         e.preventDefault()
-        onShowHelp()
+        window.dispatchEvent(new CustomEvent('taskflow:show-shortcuts'))
         return
       }
       if (e.key === '/' && !isEditing) {
@@ -31,17 +48,16 @@ function KeyboardShortcuts({ onShowHelp }: { onShowHelp: () => void }) {
       }
       if ((e.key === 'n' || e.key === 'N') && !isEditing) {
         e.preventDefault()
-        navigate('/tasks')
-        setTimeout(() => {
-          const btn = document.querySelector<HTMLButtonElement>('[aria-label^="Add task to"]')
-          btn?.click()
-        }, 100)
+        window.dispatchEvent(new CustomEvent('taskflow:new-task'))
         return
+      }
+      if (e.key === 'Escape') {
+        window.dispatchEvent(new CustomEvent('taskflow:escape'))
       }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [navigate, onShowHelp])
+  }, [])
 
   return null
 }
@@ -49,6 +65,21 @@ function KeyboardShortcuts({ onShowHelp }: { onShowHelp: () => void }) {
 export default function Layout() {
   const location = useLocation()
   const [showShortcuts, setShowShortcuts] = useState(false)
+  const [showAddTask,   setShowAddTask]   = useState(false)
+
+  useEffect(() => {
+    const onShowShortcuts = () => setShowShortcuts(true)
+    const onNewTask       = () => setShowAddTask(true)
+    const onEscape        = () => { setShowShortcuts(false); setShowAddTask(false) }
+    window.addEventListener('taskflow:show-shortcuts', onShowShortcuts)
+    window.addEventListener('taskflow:new-task',       onNewTask)
+    window.addEventListener('taskflow:escape',         onEscape)
+    return () => {
+      window.removeEventListener('taskflow:show-shortcuts', onShowShortcuts)
+      window.removeEventListener('taskflow:new-task',       onNewTask)
+      window.removeEventListener('taskflow:escape',         onEscape)
+    }
+  }, [])
 
   return (
     <ThemeProvider>
@@ -66,8 +97,16 @@ export default function Layout() {
             </div>
             <BottomNav />
           </div>
-          <KeyboardShortcuts onShowHelp={() => setShowShortcuts(true)} />
-          {showShortcuts && <ShortcutOverlay onClose={() => setShowShortcuts(false)} />}
+
+          <GlobalShortcuts />
+
+          {showShortcuts && (
+            <ShortcutOverlay onClose={() => setShowShortcuts(false)} />
+          )}
+
+          {showAddTask && (
+            <GlobalAddModal onClose={() => setShowAddTask(false)} />
+          )}
         </TodosProvider>
       </UserProvider>
     </ThemeProvider>
