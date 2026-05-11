@@ -92,7 +92,8 @@ function IconPaperclip() {
 export default function TaskDetailModal({ todo, onClose, onUpdateStatus, onDelete, onEdit }: TaskDetailModalProps) {
   const { updateSubTaskStatus } = useTodosContext()
   const todayMs    = new Date().setHours(0, 0, 0, 0)
-  const progress   = (todo.startDay != null && todo.endDay != null) || (todo.subTasks && todo.subTasks.length > 0)
+  const hasDateRange = todo.startDay != null && todo.endDay != null && todo.startDay !== todo.endDay
+  const progress     = hasDateRange || (todo.subTasks && todo.subTasks.length > 0)
     ? calcProgress(todo)
     : null
   const isOverdue  = todo.endDay != null && todo.endDay < todayMs && todo.status !== 'done'

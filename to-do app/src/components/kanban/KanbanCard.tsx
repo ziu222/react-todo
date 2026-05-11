@@ -118,6 +118,10 @@ const STATUS_ICON: Record<TodoStatus, React.ReactElement> = {
 const fmt = (ms: number) =>
   new Date(ms).toLocaleDateString('en', { month: 'short', day: 'numeric' })
 
+function fmtDate(ms: number, todayMs: number) {
+  return ms === todayMs ? 'Today' : fmt(ms)
+}
+
 const KanbanCard = memo(function KanbanCard({ todo, query, isSelected, onToggleSelect, onUpdateStatus, onUpdateTitle, onDelete, onEdit }: KanbanCardProps) {
   const [detailOpen,    setDetailOpen]    = useState(false)
   const [editingTitle,  setEditingTitle]  = useState(false)
@@ -143,7 +147,8 @@ const KanbanCard = memo(function KanbanCard({ todo, query, isSelected, onToggleS
     if (e.key === 'Escape') { setTitleDraft(todo.title); setEditingTitle(false) }
   }
   const todayMs    = new Date().setHours(0, 0, 0, 0)
-  const progress   = (todo.startDay != null && todo.endDay != null) || (todo.subTasks && todo.subTasks.length > 0)
+  const hasDateRange = todo.startDay != null && todo.endDay != null && todo.startDay !== todo.endDay
+  const progress     = hasDateRange || (todo.subTasks && todo.subTasks.length > 0)
     ? calcProgress(todo)
     : null
   const isOverdue  = todo.endDay != null && todo.endDay < todayMs && todo.status !== 'done'
@@ -172,20 +177,40 @@ const KanbanCard = memo(function KanbanCard({ todo, query, isSelected, onToggleS
           {STATUS_ICON[todo.status]}
         </div>
         <div className="kc-dates">
-          {todo.startDay ? (
+          {todo.startDay && todo.endDay && todo.startDay !== todo.endDay ? (
+            /* Range: start and end are different days */
             <>
               <span className="kc-date-item">
                 <span className="kc-date-lbl">Start</span>
-                <span className="kc-date-val">{fmt(todo.startDay)}</span>
-              </span>
-              {todo.endDay && (
-                <span className="kc-date-item">
-                  <span className="kc-date-lbl">End</span>
-                  <span className={`kc-date-val${isOverdue ? ' overdue' : ''}`}>{fmt(todo.endDay)}</span>
+                <span className={`kc-date-val${todo.startDay === todayMs ? ' today' : ''}`}>
+                  {fmtDate(todo.startDay, todayMs)}
                 </span>
-              )}
+              </span>
+              <span className="kc-date-item">
+                <span className="kc-date-lbl">End</span>
+                <span className={`kc-date-val${isOverdue ? ' overdue' : ''}${todo.endDay === todayMs ? ' today' : ''}`}>
+                  {fmtDate(todo.endDay, todayMs)}
+                </span>
+              </span>
             </>
+          ) : todo.endDay ? (
+            /* Single due date (same-day task, or only endDay set) */
+            <span className="kc-date-item">
+              <span className="kc-date-lbl">Due</span>
+              <span className={`kc-date-val${isOverdue ? ' overdue' : ''}${todo.endDay === todayMs ? ' today' : ''}`}>
+                {fmtDate(todo.endDay, todayMs)}
+              </span>
+            </span>
+          ) : todo.startDay ? (
+            /* Only start day */
+            <span className="kc-date-item">
+              <span className="kc-date-lbl">Start</span>
+              <span className={`kc-date-val${todo.startDay === todayMs ? ' today' : ''}`}>
+                {fmtDate(todo.startDay, todayMs)}
+              </span>
+            </span>
           ) : (
+            /* No dates — show created */
             <span className="kc-date-item">
               <span className="kc-date-lbl">Created</span>
               <span className="kc-date-val">{fmt(todo.createdAt)}</span>
