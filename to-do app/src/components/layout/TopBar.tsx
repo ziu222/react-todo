@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useTodosContext } from '../../app/TodosContext'
 import { useUserContext } from '../../app/UserContext'
@@ -31,8 +32,16 @@ export default function TopBar() {
   const location  = useLocation()
   const { query, setSearch } = useTodosContext()
   const { user, initials }   = useUserContext()
+  const [inputVal, setInputVal] = useState(query)
 
   const title = PAGE_TITLES[location.pathname] ?? 'My Todos'
+
+  useEffect(() => {
+    const t = setTimeout(() => setSearch(inputVal), 200)
+    return () => clearTimeout(t)
+  }, [inputVal, setSearch])
+
+  useEffect(() => { setInputVal(query) }, [query])
 
   return (
     <header className="topbar">
@@ -44,8 +53,8 @@ export default function TopBar() {
           type="search"
           className="topbar-search-input"
           placeholder="Search tasks…"
-          value={query}
-          onChange={e => setSearch(e.target.value)}
+          value={inputVal}
+          onChange={e => setInputVal(e.target.value)}
           aria-label="Search tasks"
         />
       </div>
