@@ -78,6 +78,23 @@
   padding: 0 2px;
 }
 
+/* ── Drag & drop ── */
+.kanban-column.drop-target .kanban-column-list {
+  outline: 2px dashed var(--col-color, var(--accent));
+  outline-offset: 4px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--col-color, var(--accent)) 5%, transparent);
+}
+
+li.dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+
+li[draggable] {
+  cursor: grab;
+}
+
 .kanban-column-list {
   display: flex;
   flex-direction: column;

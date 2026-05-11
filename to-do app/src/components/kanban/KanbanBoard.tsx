@@ -18,10 +18,18 @@ export default function KanbanBoard() {
   const [editingTodo,  setEditingTodo]  = useState<Todo | null>(null)
   const [selectedIds,  setSelectedIds]  = useState<Set<string>>(new Set())
   const [activeTag,    setActiveTag]    = useState<string | null>(null)
+  const [dragId,       setDragId]       = useState<string | null>(null)
   const boardRef = useRef<HTMLDivElement>(null)
 
   const allTags = Array.from(new Set(filteredTodos.flatMap(t => t.tags ?? []))).sort()
   const visibleTodos = activeTag ? filteredTodos.filter(t => t.tags?.includes(activeTag)) : filteredTodos
+
+  function handleDrop(targetStatus: TodoStatus) {
+    if (dragId) {
+      updateStatus(dragId, targetStatus)
+      setDragId(null)
+    }
+  }
 
   function toggleSelect(id: string) {
     setSelectedIds(prev => {
@@ -100,6 +108,10 @@ export default function KanbanBoard() {
             onUpdateStatus={updateStatus}
             onDelete={deleteTodo}
             onEdit={setEditingTodo}
+            dragId={dragId}
+            onDragStart={setDragId}
+            onDragEnd={() => setDragId(null)}
+            onDrop={handleDrop}
           />
         ))}
       </div>

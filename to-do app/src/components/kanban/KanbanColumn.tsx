@@ -27,21 +27,33 @@ interface KanbanColumnProps {
   onUpdateStatus:  (id: string, status: TodoStatus) => void
   onDelete:        (id: string) => void
   onEdit:          (todo: Todo) => void
+  dragId?:         string | null
+  onDragStart?:    (id: string) => void
+  onDragEnd?:      () => void
+  onDrop?:         (status: TodoStatus) => void
 }
 
 export default function KanbanColumn({
   status, label, accentColor, todos, query,
   selectedIds, onToggleSelect,
   onAdd, onUpdateStatus, onDelete, onEdit,
+  dragId, onDragStart, onDragEnd, onDrop,
 }: KanbanColumnProps) {
-  const [modalOpen, setModalOpen] = useState(false)
+  const [modalOpen,  setModalOpen]  = useState(false)
+  const [isDragOver, setIsDragOver] = useState(false)
 
   const pinned   = todos.filter(t => t.pinned)
   const unpinned = todos.filter(t => !t.pinned)
 
   function renderCard(todo: typeof todos[number]) {
     return (
-      <li key={todo.id}>
+      <li
+        key={todo.id}
+        draggable
+        onDragStart={e => { e.dataTransfer.effectAllowed = 'move'; onDragStart?.(todo.id) }}
+        onDragEnd={() => onDragEnd?.()}
+        className={dragId === todo.id ? 'dragging' : ''}
+      >
         <KanbanCard
           todo={todo}
           query={query}
@@ -55,11 +67,16 @@ export default function KanbanColumn({
     )
   }
 
+  const isDraggingOver = isDragOver && dragId != null && !todos.find(t => t.id === dragId)
+
   return (
     <section
-      className="kanban-column"
+      className={`kanban-column${isDraggingOver ? ' drop-target' : ''}`}
       data-status={status}
       style={{ '--col-color': accentColor } as React.CSSProperties}
+      onDragOver={e => { e.preventDefault(); setIsDragOver(true) }}
+      onDragLeave={() => setIsDragOver(false)}
+      onDrop={() => { setIsDragOver(false); onDrop?.(status) }}
     >
       <header className="kanban-column-header">
         <div className="kanban-column-label">
