@@ -15,6 +15,7 @@ const COLUMNS: { status: TodoStatus; label: string; color: string }[] = [
 
 export default function KanbanBoard() {
   const { filteredTodos, query, addTodo, updateStatus, deleteTodo, updateTask } = useTodosContext()
+  const updateTitle = (id: string, title: string) => updateTask(id, { title })
   const [editingTodo,  setEditingTodo]  = useState<Todo | null>(null)
   const [selectedIds,  setSelectedIds]  = useState<Set<string>>(new Set())
   const [activeTag,    setActiveTag]    = useState<string | null>(null)
@@ -106,6 +107,7 @@ export default function KanbanBoard() {
             onToggleSelect={toggleSelect}
             onAdd={({ title, ...extras }) => addTodo(title, extras)}
             onUpdateStatus={updateStatus}
+            onUpdateTitle={updateTitle}
             onDelete={deleteTodo}
             onEdit={setEditingTodo}
             dragId={dragId}
