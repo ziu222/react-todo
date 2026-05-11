@@ -3,10 +3,10 @@ interface ShortcutOverlayProps {
 }
 
 const SHORTCUTS = [
-  { key: 'N',    desc: 'Add new task' },
-  { key: '/',    desc: 'Focus search' },
-  { key: '?',    desc: 'Show shortcuts' },
-  { key: 'Esc',  desc: 'Close modal / overlay' },
+  { key: 'N',    desc: 'Add new task (from any page)' },
+  { key: '/',    desc: 'Focus search bar' },
+  { key: '?',    desc: 'Show this shortcuts guide' },
+  { key: 'Esc',  desc: 'Close any open modal' },
 ]
 
 export default function ShortcutOverlay({ onClose }: ShortcutOverlayProps) {

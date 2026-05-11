@@ -61,6 +61,58 @@
   height: 16px;
 }
 
+/* ── Search hint ── */
+.topbar-search-hint {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-page);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 1px 5px;
+  pointer-events: none;
+  opacity: 0.7;
+  font-family: ui-monospace, monospace;
+}
+
+.topbar-search-input:focus ~ .topbar-search-hint {
+  opacity: 0;
+}
+
+/* ── New task button ── */
+.topbar-new-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px 0 10px;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: background var(--transition-fast), transform 0.15s;
+}
+
+.topbar-new-btn:hover  { background: var(--accent-hover, var(--accent)); filter: brightness(1.1); }
+.topbar-new-btn:active { transform: scale(0.96); }
+
+.topbar-new-btn svg { width: 15px; height: 15px; }
+
+.topbar-kbd {
+  font-family: ui-monospace, 'Cascadia Code', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+  padding: 1px 4px;
+  line-height: 1.4;
+}
+
 .topbar-actions {
   display: flex;
   align-items: center;

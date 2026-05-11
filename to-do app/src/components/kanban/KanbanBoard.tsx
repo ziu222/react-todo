@@ -14,7 +14,7 @@ const COLUMNS: { status: TodoStatus; label: string; color: string }[] = [
 ]
 
 export default function KanbanBoard() {
-  const { filteredTodos, query, addTodo, updateStatus, deleteTodo, updateTask } = useTodosContext()
+  const { filteredTodos, query, addTodo, updateStatus, deleteTodo, updateTask, seedDemoTasks } = useTodosContext()
   const updateTitle = (id: string, title: string) => updateTask(id, { title })
   const [editingTodo,  setEditingTodo]  = useState<Todo | null>(null)
   const [selectedIds,  setSelectedIds]  = useState<Set<string>>(new Set())
@@ -22,8 +22,9 @@ export default function KanbanBoard() {
   const [dragId,       setDragId]       = useState<string | null>(null)
   const boardRef = useRef<HTMLDivElement>(null)
 
-  const allTags = Array.from(new Set(filteredTodos.flatMap(t => t.tags ?? []))).sort()
+  const allTags      = Array.from(new Set(filteredTodos.flatMap(t => t.tags ?? []))).sort()
   const visibleTodos = activeTag ? filteredTodos.filter(t => t.tags?.includes(activeTag)) : filteredTodos
+  const isEmpty      = filteredTodos.length === 0 && !query.trim()
 
   function handleDrop(targetStatus: TodoStatus) {
     if (dragId) {
@@ -95,27 +96,52 @@ export default function KanbanBoard() {
       )}
 
       <div className="kanban-board" ref={boardRef}>
-        {COLUMNS.map(col => (
-          <KanbanColumn
-            key={col.status}
-            status={col.status}
-            label={col.label}
-            accentColor={col.color}
-            todos={visibleTodos.filter(t => t.status === col.status)}
-            query={query}
-            selectedIds={selectedIds}
-            onToggleSelect={toggleSelect}
-            onAdd={({ title, ...extras }) => addTodo(title, extras)}
-            onUpdateStatus={updateStatus}
-            onUpdateTitle={updateTitle}
-            onDelete={deleteTodo}
-            onEdit={setEditingTodo}
-            dragId={dragId}
-            onDragStart={setDragId}
-            onDragEnd={() => setDragId(null)}
-            onDrop={handleDrop}
-          />
-        ))}
+        {isEmpty ? (
+          <div className="kanban-empty-board">
+            <span className="kanban-empty-board-emoji">📋</span>
+            <span className="kanban-empty-board-title">Your board is empty</span>
+            <span className="kanban-empty-board-sub">
+              Create your first task or load sample data to explore all the features — tags, priorities, subtasks, and more.
+            </span>
+            <div className="kanban-empty-board-actions">
+              <button
+                className="kanban-empty-board-btn primary"
+                onClick={() => window.dispatchEvent(new CustomEvent('taskflow:new-task'))}
+              >
+                + Create first task
+                <kbd style={{ fontSize: '0.65rem', background: 'rgba(255,255,255,0.2)', borderRadius: 3, padding: '1px 5px', marginLeft: 2 }}>N</kbd>
+              </button>
+              <button
+                className="kanban-empty-board-btn secondary"
+                onClick={seedDemoTasks}
+              >
+                🎲 Load sample tasks
+              </button>
+            </div>
+          </div>
+        ) : (
+          COLUMNS.map(col => (
+            <KanbanColumn
+              key={col.status}
+              status={col.status}
+              label={col.label}
+              accentColor={col.color}
+              todos={visibleTodos.filter(t => t.status === col.status)}
+              query={query}
+              selectedIds={selectedIds}
+              onToggleSelect={toggleSelect}
+              onAdd={({ title, ...extras }) => addTodo(title, extras)}
+              onUpdateStatus={updateStatus}
+              onUpdateTitle={updateTitle}
+              onDelete={deleteTodo}
+              onEdit={setEditingTodo}
+              dragId={dragId}
+              onDragStart={setDragId}
+              onDragEnd={() => setDragId(null)}
+              onDrop={handleDrop}
+            />
+          ))
+        )}
       </div>
 
       <div className="kanban-dots" aria-hidden="true">

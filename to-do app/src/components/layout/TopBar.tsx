@@ -28,6 +28,23 @@ function IconBell() {
   )
 }
 
+function IconKeyboard() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="6" width="20" height="12" rx="2" />
+      <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8M6 10h.01" />
+    </svg>
+  )
+}
+
+function IconPlus() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  )
+}
+
 export default function TopBar() {
   const location  = useLocation()
   const { query, setSearch } = useTodosContext()
@@ -43,6 +60,14 @@ export default function TopBar() {
 
   useEffect(() => { setInputVal(query) }, [query])
 
+  function openNewTask() {
+    window.dispatchEvent(new CustomEvent('taskflow:new-task'))
+  }
+
+  function openShortcuts() {
+    window.dispatchEvent(new CustomEvent('taskflow:show-shortcuts'))
+  }
+
   return (
     <header className="topbar">
       <span className="topbar-title">{title}</span>
@@ -57,9 +82,30 @@ export default function TopBar() {
           onChange={e => setInputVal(e.target.value)}
           aria-label="Search tasks"
         />
+        <span className="topbar-search-hint" aria-hidden="true">/</span>
       </div>
 
       <div className="topbar-actions">
+        <button
+          className="topbar-new-btn"
+          onClick={openNewTask}
+          aria-label="New task"
+          title="New task (N)"
+        >
+          <IconPlus />
+          <span className="topbar-new-label">New</span>
+          <kbd className="topbar-kbd">N</kbd>
+        </button>
+
+        <button
+          className="topbar-icon-btn"
+          onClick={openShortcuts}
+          aria-label="Keyboard shortcuts"
+          title="Keyboard shortcuts (?)"
+        >
+          <IconKeyboard />
+        </button>
+
         <button className="topbar-icon-btn" aria-label="Notifications">
           <IconBell />
           <span className="topbar-badge" aria-hidden="true" />
