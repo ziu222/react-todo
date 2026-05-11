@@ -76,6 +76,7 @@ export function calcProgress(todo: Todo): number {
     return Math.min(99, Math.round(total / todo.subTasks.length))
   }
   if (todo.startDay == null || todo.endDay == null) return 0
+  if (todo.startDay === todo.endDay) return 0
   const todayMs = new Date().setHours(0, 0, 0, 0)
   if (todayMs <= todo.startDay) return 0
   return Math.min(99, Math.round(
