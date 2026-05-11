@@ -172,16 +172,25 @@ export default function KanbanCard({ todo, query, isSelected, onToggleSelect, on
         </div>
       </div>
 
-      {/* ── Center: title + tags ── */}
+      {/* ── Center: title + desc + tags ── */}
       <div className="kc-body">
         <p className="kc-title">
           {todo.emoji && <span className="kc-emoji">{todo.emoji}</span>}
           {highlightMatchingText(todo.title, query)}
         </p>
+        {todo.description && (
+          <p className="kc-desc">{todo.description}</p>
+        )}
         <div className="kc-meta-row">
           {todo.tags?.slice(0, 2).map(t => (
             <span key={t} className="kc-tag">{t}</span>
           ))}
+          {todo.subTasks && todo.subTasks.length > 0 && (
+            <span className="kc-meta-item">
+              <IconCheck />
+              {todo.subTasks.filter(s => s.status === 'done').length}/{todo.subTasks.length}
+            </span>
+          )}
           {todo.attachments && todo.attachments.length > 0 && (
             <span className="kc-meta-item">
               <IconPaperclip />
