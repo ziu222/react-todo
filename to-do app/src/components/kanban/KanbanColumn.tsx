@@ -27,20 +27,56 @@ interface KanbanColumnProps {
   onUpdateStatus:  (id: string, status: TodoStatus) => void
   onDelete:        (id: string) => void
   onEdit:          (todo: Todo) => void
+  dragId?:         string | null
+  onDragStart?:    (id: string) => void
+  onDragEnd?:      () => void
+  onDrop?:         (status: TodoStatus) => void
 }
 
 export default function KanbanColumn({
   status, label, accentColor, todos, query,
   selectedIds, onToggleSelect,
   onAdd, onUpdateStatus, onDelete, onEdit,
+  dragId, onDragStart, onDragEnd, onDrop,
 }: KanbanColumnProps) {
-  const [modalOpen, setModalOpen] = useState(false)
+  const [modalOpen,  setModalOpen]  = useState(false)
+  const [isDragOver, setIsDragOver] = useState(false)
+
+  const pinned   = todos.filter(t => t.pinned)
+  const unpinned = todos.filter(t => !t.pinned)
+
+  function renderCard(todo: typeof todos[number]) {
+    return (
+      <li
+        key={todo.id}
+        draggable
+        onDragStart={e => { e.dataTransfer.effectAllowed = 'move'; onDragStart?.(todo.id) }}
+        onDragEnd={() => onDragEnd?.()}
+        className={dragId === todo.id ? 'dragging' : ''}
+      >
+        <KanbanCard
+          todo={todo}
+          query={query}
+          isSelected={selectedIds.has(todo.id)}
+          onToggleSelect={onToggleSelect}
+          onUpdateStatus={onUpdateStatus}
+          onDelete={onDelete}
+          onEdit={onEdit}
+        />
+      </li>
+    )
+  }
+
+  const isDraggingOver = isDragOver && dragId != null && !todos.find(t => t.id === dragId)
 
   return (
     <section
-      className="kanban-column"
+      className={`kanban-column${isDraggingOver ? ' drop-target' : ''}`}
       data-status={status}
       style={{ '--col-color': accentColor } as React.CSSProperties}
+      onDragOver={e => { e.preventDefault(); setIsDragOver(true) }}
+      onDragLeave={() => setIsDragOver(false)}
+      onDrop={() => { setIsDragOver(false); onDrop?.(status) }}
     >
       <header className="kanban-column-header">
         <div className="kanban-column-label">
@@ -59,8 +95,15 @@ export default function KanbanColumn({
         </button>
       </header>
 
+      {pinned.length > 0 && (
+        <div className="kanban-pinned-section">
+          <span className="kanban-pinned-label">📌 Pinned</span>
+          <ul className="kanban-column-list">{pinned.map(renderCard)}</ul>
+        </div>
+      )}
+
       <ul className="kanban-column-list">
-        {todos.length === 0 && (
+        {unpinned.length === 0 && pinned.length === 0 && (
           <li className="kanban-column-empty">
             <span className="kanban-column-empty-icon">
               {status === 'backlog' ? '📋' : status === 'todo' ? '✅' : status === 'in-progress' ? '⚡' : '🎉'}
@@ -73,19 +116,7 @@ export default function KanbanColumn({
             </span>
           </li>
         )}
-        {todos.map(todo => (
-          <li key={todo.id}>
-            <KanbanCard
-              todo={todo}
-              query={query}
-              isSelected={selectedIds.has(todo.id)}
-              onToggleSelect={onToggleSelect}
-              onUpdateStatus={onUpdateStatus}
-              onDelete={onDelete}
-              onEdit={onEdit}
-            />
-          </li>
-        ))}
+        {unpinned.map(renderCard)}
       </ul>
 
       {modalOpen && (

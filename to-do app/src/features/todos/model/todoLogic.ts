@@ -293,11 +293,15 @@ export function selectFilteredTodos(todos: Todo[], filter: Filter, query: string
 }
 
 export function selectCounts(todos: Todo[]) {
+  const todayMs    = new Date().setHours(0, 0, 0, 0)
+  const tomorrowMs = todayMs + 86_400_000
   return {
     all:           todos.length,
     backlog:       todos.filter(t => t.status === 'backlog').length,
     todo:          todos.filter(t => t.status === 'todo').length,
     'in-progress': todos.filter(t => t.status === 'in-progress').length,
     done:          todos.filter(t => t.status === 'done').length,
+    overdue:       todos.filter(t => t.endDay != null && t.endDay < todayMs  && t.status !== 'done').length,
+    dueToday:      todos.filter(t => t.endDay != null && t.endDay >= todayMs && t.endDay < tomorrowMs && t.status !== 'done').length,
   }
 }
