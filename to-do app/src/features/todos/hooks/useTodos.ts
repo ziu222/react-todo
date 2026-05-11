@@ -110,6 +110,7 @@ export function useTodos() {
   }, [])
 
   return {
+    todos:         state.todos,
     filteredTodos: selectFilteredTodos(state.todos, state.filter, state.query),
     counts:        selectCounts(state.todos),
     filter:        state.filter,

@@ -142,6 +142,10 @@
   height: 18px;
 }
 
+.topbar-notif-wrap {
+  position: relative;
+}
+
 .topbar-badge {
   position: absolute;
   top: 5px;
