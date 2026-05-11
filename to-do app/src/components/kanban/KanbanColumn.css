@@ -62,6 +62,22 @@
 .kanban-column-add-btn svg { width: 16px; height: 16px; }
 
 
+/* ── Pinned section ── */
+.kanban-pinned-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kanban-pinned-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  padding: 0 2px;
+}
+
 .kanban-column-list {
   display: flex;
   flex-direction: column;

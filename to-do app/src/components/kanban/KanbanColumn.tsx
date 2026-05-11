@@ -36,6 +36,25 @@ export default function KanbanColumn({
 }: KanbanColumnProps) {
   const [modalOpen, setModalOpen] = useState(false)
 
+  const pinned   = todos.filter(t => t.pinned)
+  const unpinned = todos.filter(t => !t.pinned)
+
+  function renderCard(todo: typeof todos[number]) {
+    return (
+      <li key={todo.id}>
+        <KanbanCard
+          todo={todo}
+          query={query}
+          isSelected={selectedIds.has(todo.id)}
+          onToggleSelect={onToggleSelect}
+          onUpdateStatus={onUpdateStatus}
+          onDelete={onDelete}
+          onEdit={onEdit}
+        />
+      </li>
+    )
+  }
+
   return (
     <section
       className="kanban-column"
@@ -59,8 +78,15 @@ export default function KanbanColumn({
         </button>
       </header>
 
+      {pinned.length > 0 && (
+        <div className="kanban-pinned-section">
+          <span className="kanban-pinned-label">📌 Pinned</span>
+          <ul className="kanban-column-list">{pinned.map(renderCard)}</ul>
+        </div>
+      )}
+
       <ul className="kanban-column-list">
-        {todos.length === 0 && (
+        {unpinned.length === 0 && pinned.length === 0 && (
           <li className="kanban-column-empty">
             <span className="kanban-column-empty-icon">
               {status === 'backlog' ? '📋' : status === 'todo' ? '✅' : status === 'in-progress' ? '⚡' : '🎉'}
@@ -73,19 +99,7 @@ export default function KanbanColumn({
             </span>
           </li>
         )}
-        {todos.map(todo => (
-          <li key={todo.id}>
-            <KanbanCard
-              todo={todo}
-              query={query}
-              isSelected={selectedIds.has(todo.id)}
-              onToggleSelect={onToggleSelect}
-              onUpdateStatus={onUpdateStatus}
-              onDelete={onDelete}
-              onEdit={onEdit}
-            />
-          </li>
-        ))}
+        {unpinned.map(renderCard)}
       </ul>
 
       {modalOpen && (
